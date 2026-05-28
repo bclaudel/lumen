@@ -77,7 +77,7 @@ Rectangle {
         hoverEnabled: true
 
         onClicked: {
-            Hyprland.dispatch('global quickshell:controlCenterToggle');
+            Hyprland.dispatch('hl.dsp.global("quickshell:controlCenterToggle")');
         }
     }
 }

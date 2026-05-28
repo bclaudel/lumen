@@ -144,7 +144,7 @@ PanelWindow {
                                     iconSize: Theme.iconSize
 
                                     onClicked: {
-                                        Hyprland.dispatch("global quickshell:openLauncherModal");
+                                        Hyprland.dispatch('hl.dsp.global("quickshell:openLauncherModal")');
                                     }
                                 }
 
@@ -155,7 +155,7 @@ PanelWindow {
                                     iconSize: Theme.iconSize
 
                                     onClicked: {
-                                        Hyprland.dispatch("global quickshell:sessionScreenOpen");
+                                        Hyprland.dispatch('hl.dsp.global("quickshell:sessionScreenOpen")');
                                     }
                                 }
                             }
