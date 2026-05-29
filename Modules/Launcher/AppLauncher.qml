@@ -1,7 +1,7 @@
 import QtQuick
 
 import qs.Common
-import qs.Services
+import qs.Services as Services
 
 Item {
     id: root
@@ -17,9 +17,9 @@ Item {
         filteredModel.clear();
         var apps = [];
         if (searchQuery === "") {
-            apps = AppSearchService.searchApplications(searchQuery);
+            apps = Services.AppSearchService.searchApplications(searchQuery);
         } else {
-            apps = AppSearchService.searchApplications(searchQuery);
+            apps = Services.AppSearchService.searchApplications(searchQuery);
         }
 
         if (searchQuery === "") {
