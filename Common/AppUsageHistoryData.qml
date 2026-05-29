@@ -9,7 +9,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property var appUsageRanking: {}
+    property var appUsageRanking: ({})
 
     Component.onCompleted: {
         loadSettings();
@@ -17,6 +17,11 @@ Singleton {
 
     function loadSettings() {
         parseSettings(settingsFile.text());
+
+        // On first run the file does not exist yet, so persist the default shape.
+        if (!settingsFile.loaded) {
+            saveSettings();
+        }
     }
 
     function parseSettings(content) {
@@ -61,19 +66,19 @@ Singleton {
         if (!appId)
             return 0;
 
-        var appData = appUsageRanking[appId];
+        var appData = root.appUsageRanking[appId];
         if (!appData)
             return 0;
 
         var score = appData.score;
-        var lastUsed = appData.lastUsed;
+        var ageSeconds = (Date.now() - appData.lastUsed) / 1000;
 
         // Weight by recency
-        if (lastUsed < lastUsed + 60 * 60) {
+        if (ageSeconds < 60 * 60) {
             score *= 4;
-        } else if (lastUsed < lastUsed + 24 * 60 * 60) {
+        } else if (ageSeconds < 24 * 60 * 60) {
             score *= 2;
-        } else if (lastUsed < lastUsed + 7 * 24 * 60 * 60) {
+        } else if (ageSeconds < 7 * 24 * 60 * 60) {
             score *= 0.5;
         } else {
             score *= 0.25;
@@ -86,16 +91,18 @@ Singleton {
         id: settingsFile
 
         path: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
-              + "/andidote/appUsageHistory.json"
+              + "/lumen/appUsageHistory.json"
         blockLoading: true
         blockWrites: true
+        printErrors: false
         watchChanges: true
 
         onLoaded: {
             root.parseSettings(settingsFile.text());
         }
-        onLoadFailed: {
-            console.warn("Failed to load settings file:", path);
+        onLoadFailed: error => {
+            if (error !== FileViewError.FileNotFound)
+                console.warn("Failed to load settings file:", path, FileViewError.toString(error));
         }
     }
 }

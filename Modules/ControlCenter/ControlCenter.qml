@@ -42,7 +42,7 @@ PanelWindow {
         windows: [root]
 
         onCleared: () => {
-            closeControlCenter();
+            root.closeControlCenter();
         }
     }
 

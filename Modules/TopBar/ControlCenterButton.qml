@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
@@ -61,9 +60,9 @@ Rectangle {
                     return "lan";
 
                 if (NetworkService.networkStatus === "wifi")
-                    return getWifiSignalIcon(NetworkService.wifiSignalStrengthStr);
+                    return root.getWifiSignalIcon(NetworkService.wifiSignalStrengthStr);
                 else
-                    "wifi_off";
+                    return "wifi_off";
             }
             size: Theme.iconSize - 4
         }

@@ -11,8 +11,8 @@ PanelWindow {
     property alias content: contentLoader.sourceComponent
     property alias contentLoader: contentLoader
 
-    property real height: 300
-    property real width: 400
+    property real modalHeight: 300
+    property real modalWidth: 400
     property string positioning: "center"
     property color backgroundColor: Theme.popupBackground()
     property color borderColor: Theme.outlineMedium
@@ -73,8 +73,8 @@ PanelWindow {
     Rectangle {
         id: content
 
-        height: root.height
-        width: root.width
+        height: root.modalHeight
+        width: root.modalWidth
         // anchors.centerIn: root.positioning === "center" ? parent : undefined
         anchors.top: parent.top
         anchors.topMargin: 5 * Theme.barHeight

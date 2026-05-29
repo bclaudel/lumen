@@ -13,4 +13,8 @@ Singleton {
     property string networkPreference: "auto"
     property real topBarTransparency: 0.75
     property string fontFamily: "Roboto"
+
+    function setNetworkPreference(preference) {
+        root.networkPreference = preference;
+    }
 }

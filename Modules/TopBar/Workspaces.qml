@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell.Hyprland
 
@@ -35,7 +37,7 @@ Rectangle {
     // Listen for changes in Hyprland.workspaces.values
     Connections {
         function onValuesChanged() {
-            getWorkspaces();
+            root.getWorkspaces();
         }
 
         target: Hyprland.workspaces
@@ -52,8 +54,8 @@ Rectangle {
 
             Rectangle {
                 required property int index
-                property bool isActive: workspaces[index]?.active ?? false
-                property bool isOccupied: workspaces[index] !== undefined
+                property bool isActive: root.workspaces[index]?.active ?? false
+                property bool isOccupied: root.workspaces[index] !== undefined
 
                 color: isActive ? Theme.primary : isOccupied ? Theme.surfaceTextAlpha :
                                                                Theme.surfaceTextLight

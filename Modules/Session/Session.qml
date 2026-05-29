@@ -132,10 +132,8 @@ Scope {
                         buttonIcon: "lock"
                         focus: sessionRoot.visible
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["loginctl", "lock-session"]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["loginctl", "lock-session"]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)
@@ -152,10 +150,8 @@ Scope {
                         buttonText: "Logout"
                         buttonIcon: "logout"
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["pkill", "Hyprland"]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["pkill", "Hyprland"]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)
@@ -173,11 +169,9 @@ Scope {
                         buttonText: "Hibernate"
                         buttonIcon: "downloading"
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["bash", "-c",
-                                                         `systemctl hibernate || loginctl hibernate`]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["bash", "-c",
+                                                     `systemctl hibernate || loginctl hibernate`]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)
@@ -194,11 +188,9 @@ Scope {
                         buttonText: "Shutdown"
                         buttonIcon: "power_settings_new"
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["bash", "-c",
-                                                         `systemctl poweroff || loginctl poweroff`]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["bash", "-c",
+                                                     `systemctl poweroff || loginctl poweroff`]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)
@@ -215,11 +207,8 @@ Scope {
                         buttonText: "Reboot"
                         buttonIcon: "restart_alt"
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["bash", "-c",
-                                                         `reboot || loginctl reboot`]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["bash", "-c", `reboot || loginctl reboot`]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)
@@ -237,11 +226,9 @@ Scope {
                         buttonText: "Reboot to firmware settings"
                         buttonIcon: "settings_applications"
                         onClicked: {
-                            onClicked: {
-                                Quickshell.execDetached(["bash", "-c",
-                                                         `systemctl reboot --firmware-setup || loginctl reboot --firmware-setup`]);
-                                root.closeSessionScreen();
-                            }
+                            Quickshell.execDetached(["bash", "-c",
+                                                     `systemctl reboot --firmware-setup || loginctl reboot --firmware-setup`]);
+                            root.closeSessionScreen();
                         }
                         onFocusChanged: {
                             if (focus)

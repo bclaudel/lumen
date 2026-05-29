@@ -6,7 +6,6 @@ RippleButton {
     id: button
 
     property string buttonIcon
-    property string buttonText
     property real size: 120
 
     backgroundColor: (button.focus || button.down) ? Theme.secondary : Theme.surfaceVariant

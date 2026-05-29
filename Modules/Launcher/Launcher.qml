@@ -19,13 +19,6 @@ Modal {
     function show() {
         spotlightOpen = true;
         open();
-
-        // Force the focus to the search field after opening
-        Qt.callLater(() => {
-            if (contentLoader.item && contentLoader.item.searchField) {
-                contentLoader.item.searchField.forceActiveFocus();
-            }
-        });
     }
 
     function hide() {
@@ -35,14 +28,14 @@ Modal {
 
     function toggle() {
         if (spotlightOpen) {
-            show();
-        } else {
             hide();
+        } else {
+            show();
         }
     }
 
-    width: 550
-    height: 600
+    modalWidth: 550
+    modalHeight: 600
     content: spotlightContent
     onVisibleChanged: {
         if (visible && !spotlightOpen) {
@@ -108,6 +101,8 @@ Modal {
                         iconSize: Theme.iconSize
                         iconColor: Theme.surfaceVariantText
                         iconFocusedColor: Theme.primary
+
+                        Component.onCompleted: Qt.callLater(() => forceActiveFocus())
 
                         onTextEdited: {
                             appLauncher.searchQuery = searchField.text;
