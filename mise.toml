@@ -67,6 +67,13 @@ fi
 
 if [ -n "$build_dir" ] && [ -d "$build_dir/qs" ]; then
   printf '%s\n' "Using Quickshell tooling VFS at $build_dir"
+
+  if [ -f .qmllint.ini ]; then
+    cp .qmllint.ini "$build_dir/qs/.qmllint.ini"
+  else
+    rm -f "$build_dir/qs/.qmllint.ini"
+  fi
+
   git ls-files -z -- '*.qml' | xargs -0 -r -n1 sh -ceu '
     build_dir=$1
     qmllint=$2
