@@ -100,9 +100,63 @@ else
 fi
 '''
 
+[tasks.lint-staged]
+description = "Lint staged QML files with Qt 6 qmllint"
+run = '''
+qmllint=/usr/lib/qt6/bin/qmllint
+build_dir=""
+
+if [ -f .qmlls.ini ]; then
+  while IFS= read -r line; do
+    case "$line" in
+      buildDir=*)
+        build_dir=${line#buildDir=}
+        build_dir=${build_dir#\"}
+        build_dir=${build_dir%\"}
+        break
+        ;;
+    esac
+  done < .qmlls.ini
+fi
+
+if [ -n "$build_dir" ] && [ -d "$build_dir/qs" ]; then
+  printf '%s\n' "Using Quickshell tooling VFS at $build_dir"
+
+  if [ -f .qmllint.ini ]; then
+    cp .qmllint.ini "$build_dir/qs/.qmllint.ini"
+  else
+    rm -f "$build_dir/qs/.qmllint.ini"
+  fi
+
+  git diff --cached --name-only --diff-filter=ACMR -z -- '*.qml' | xargs -0 -r -n1 sh -ceu '
+    build_dir=$1
+    qmllint=$2
+    src=$3
+    vfs_file="$build_dir/qs/$src"
+
+    if [ ! -e "$vfs_file" ]; then
+      printf "Missing VFS mirror for %s\n" "$src" >&2
+      exit 1
+    fi
+
+    printf "Linting %s\n" "$src"
+    "$qmllint" -I "$build_dir" -I /usr/lib/qt6/qml "$vfs_file"
+  ' sh "$build_dir" "$qmllint"
+else
+  printf '%s\n' "Warning: Quickshell tooling VFS not available; falling back to direct source linting."
+  git diff --cached --name-only --diff-filter=ACMR -z -- '*.qml' | xargs -0 -r -n1 sh -ceu '
+    qmllint=$1
+    src=$2
+
+    printf "Linting %s\n" "$src"
+    "$qmllint" "$src"
+  ' sh "$qmllint"
+fi
+'''
+
 [tasks.pre-commit]
 description = "Run staged non-mutating checks used by the local pre-commit hook"
-depends = ["format-staged-check"]
+depends = ["format-staged-check", "lint-staged"]
 
 [tasks.check]
 description = "Run non-mutating repository checks"
