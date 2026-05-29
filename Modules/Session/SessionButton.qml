@@ -21,7 +21,7 @@ RippleButton {
     }
 
     Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
-                        button.clicked();
-                    }
+        if (event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
+            button.clicked();
+    }
 }

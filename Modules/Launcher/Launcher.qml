@@ -22,10 +22,10 @@ Modal {
 
         // Force the focus to the search field after opening
         Qt.callLater(() => {
-                         if (contentLoader.item && contentLoader.item.searchField) {
-                             contentLoader.item.searchField.forceActiveFocus();
-                         }
-                     });
+            if (contentLoader.item && contentLoader.item.searchField) {
+                contentLoader.item.searchField.forceActiveFocus();
+            }
+        });
     }
 
     function hide() {

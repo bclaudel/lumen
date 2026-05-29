@@ -59,14 +59,14 @@ PanelWindow {
             enabled: root.visible
 
             onClicked: mouse => {
-                           var localPos = mapToItem(content, mouse.x, mouse.y);
+                var localPos = mapToItem(content, mouse.x, mouse.y);
 
-                           // Check if the clik is outside the content area
-                           if (localPos.x < 0 || localPos.x > content.width || localPos.y < 0
-                               || localPos.y > content.height) {
-                               root.backgroundClicked();
-                           }
-                       }
+                // Check if the clik is outside the content area
+                if (localPos.x < 0 || localPos.x > content.width || localPos.y < 0 || localPos.y
+                        > content.height) {
+                    root.backgroundClicked();
+                }
+            }
         }
     }
 
@@ -102,7 +102,7 @@ PanelWindow {
         visible: root.visible
 
         Keys.onEscapePressed: event => {
-                                  root.close();
-                              }
+            root.close();
+        }
     }
 }

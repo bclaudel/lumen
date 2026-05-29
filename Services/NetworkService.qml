@@ -300,7 +300,7 @@ Singleton {
 
             onRead: line => {
                 if (line.includes("StateChanged") || line.includes("PrimaryConnectionChanged")
-                    || line.includes("WirelessEnabled") || line.includes("ActiveConnection")) {
+                        || line.includes("WirelessEnabled") || line.includes("ActiveConnection")) {
                     root.refreshNetworkState();
                 }
             }
@@ -829,9 +829,9 @@ Singleton {
                 ToastService.showInfo(`Forgot network ${root.forgetSSID}`);
 
                 root.savedConnections = root.savedConnections.filter(s => s.ssid
-                                                                     !== root.forgetSSID);
+                                                                          !== root.forgetSSID);
                 root.savedWifiNetworks = root.savedWifiNetworks.filter(s => s.ssid
-                                                                       !== root.forgetSSID);
+                                                                            !== root.forgetSSID);
 
                 let updated = [...root.wifiNetworks];
                 for (let network of updated) {

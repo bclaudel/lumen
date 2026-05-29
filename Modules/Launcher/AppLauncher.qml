@@ -24,33 +24,33 @@ Item {
 
         if (searchQuery === "") {
             apps.sort((a, b) => {
-                          var aFrecency = AppUsageHistoryData.computeFrecency(a.id);
-                          var bFrecency = AppUsageHistoryData.computeFrecency(b.id);
+                var aFrecency = AppUsageHistoryData.computeFrecency(a.id);
+                var bFrecency = AppUsageHistoryData.computeFrecency(b.id);
 
-                          // First sort by frecency
-                          if (aFrecency !== bFrecency) {
-                              return bFrecency - aFrecency;
-                          }
+                // First sort by frecency
+                if (aFrecency !== bFrecency) {
+                    return bFrecency - aFrecency;
+                }
 
-                          // Then sort alphabetically
-                          var aName = (a.name || "").toLowerCase();
-                          var bName = (b.name || "").toLowerCase();
-                          return aName.localeCompare(bName);
-                      });
+                // Then sort alphabetically
+                var aName = (a.name || "").toLowerCase();
+                var bName = (b.name || "").toLowerCase();
+                return aName.localeCompare(bName);
+            });
         }
 
         apps.forEach(app => {
-                         if (app) {
-                             filteredModel.append({
-                                                      "name": app.name || "",
-                                                      "exec": app.exec || "",
-                                                      "icon": app.icon || "application-x-executable",
-                                                      "comment": app.comment || "",
-                                                      "categories": app.categories || [],
-                                                      "desktopEntry": app
-                                                  });
-                         }
-                     });
+            if (app) {
+                filteredModel.append({
+                                         "name": app.name || "",
+                                         "exec": app.exec || "",
+                                         "icon": app.icon || "application-x-executable",
+                                         "comment": app.comment || "",
+                                         "categories": app.categories || [],
+                                         "desktopEntry": app
+                                     });
+            }
+        });
     }
 
     function selectNext() {
