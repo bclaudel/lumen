@@ -42,8 +42,8 @@ PanelWindow {
         windows: [root]
 
         onCleared: () => {
-                       closeControlCenter();
-                   }
+            closeControlCenter();
+        }
     }
 
     Loader {
@@ -66,97 +66,96 @@ PanelWindow {
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
 
-                    Column {
-                        spacing: Theme.spacingM
-                        width: parent.width
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 90
 
-                        Rectangle {
-                            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b,
-                                                  0.08)
-                            border.width: 1
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g,
-                                           Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha(
-                                               ) * 0.4)
-                            height: 90
-                            radius: Theme.cornerRadius
-                            width: parent.width
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b,
+                                              0.08)
 
-                            Row {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingL
-                                anchors.rightMargin: Theme.spacingL
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingL
+                        border.width: 1
+                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g,
+                                       Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha()
+                                       * 0.4)
+                        radius: Theme.cornerRadius
 
-                                Item {
-                                    id: avatarContainer
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingL
+                            anchors.rightMargin: Theme.spacingL
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingL
 
-                                    height: 64
-                                    width: 64
+                            Item {
+                                id: avatarContainer
 
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        border.color: Theme.primary
-                                        border.width: 1
-                                        color: "transparent"
-                                        radius: width / 2
-                                        visible: true
-                                    }
-                                }
+                                height: 64
+                                width: 64
 
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    spacing: Theme.spacingXS
-
-                                    StyledText {
-                                        color: Theme.surfaceText
-                                        font.pixelSize: Theme.fontSizeLarge
-                                        font.weight: Font.Medium
-                                        text: "Ekko"
-                                    }
-
-                                    StyledText {
-                                        color: Theme.surfaceText
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        font.weight: Font.Normal
-                                        text: "Unknown"
-                                    }
+                                Rectangle {
+                                    anchors.fill: parent
+                                    border.color: Theme.primary
+                                    border.width: 1
+                                    color: "transparent"
+                                    radius: width / 2
+                                    visible: true
                                 }
                             }
 
-                            Row {
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingL
+                            Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
+                                spacing: Theme.spacingXS
 
-                                MaterialButton {
-                                    buttonSize: 40
-                                    iconColor: Theme.surfaceText
-                                    iconName: "restart_alt"
-                                    iconSize: Theme.iconSize
+                                StyledText {
+                                    color: Theme.surfaceText
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Medium
+                                    text: "Ekko"
                                 }
 
-                                MaterialButton {
-                                    buttonSize: 40
-                                    iconColor: Theme.surfaceText
-                                    iconName: "settings"
-                                    iconSize: Theme.iconSize
-
-                                    onClicked: {
-                                        Hyprland.dispatch('hl.dsp.global("quickshell:openLauncherModal")');
-                                    }
+                                StyledText {
+                                    color: Theme.surfaceText
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Normal
+                                    text: "Unknown"
                                 }
+                            }
+                        }
 
-                                MaterialButton {
-                                    buttonSize: 40
-                                    iconColor: Theme.surfaceText
-                                    iconName: "power_settings_new"
-                                    iconSize: Theme.iconSize
+                        Row {
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingL
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
 
-                                    onClicked: {
-                                        Hyprland.dispatch('hl.dsp.global("quickshell:sessionScreenOpen")');
-                                    }
+                            MaterialButton {
+                                buttonSize: 40
+                                iconColor: Theme.surfaceText
+                                iconName: "restart_alt"
+                                iconSize: Theme.iconSize
+                            }
+
+                            MaterialButton {
+                                buttonSize: 40
+                                iconColor: Theme.surfaceText
+                                iconName: "settings"
+                                iconSize: Theme.iconSize
+
+                                onClicked: {
+                                    Hyprland.dispatch(
+                                                'hl.dsp.global("quickshell:openLauncherModal")');
+                                }
+                            }
+
+                            MaterialButton {
+                                buttonSize: 40
+                                iconColor: Theme.surfaceText
+                                iconName: "power_settings_new"
+                                iconSize: Theme.iconSize
+
+                                onClicked: {
+                                    Hyprland.dispatch(
+                                                'hl.dsp.global("quickshell:sessionScreenOpen")');
                                 }
                             }
                         }
@@ -170,9 +169,9 @@ PanelWindow {
         }
 
         Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Escape)
-                            root.closeControlCenter();
-                        }
+            if (event.key === Qt.Key_Escape)
+                root.closeControlCenter();
+        }
 
         anchors {
             bottom: parent.bottom

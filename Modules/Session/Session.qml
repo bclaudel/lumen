@@ -16,7 +16,7 @@ Scope {
     id: root
 
     property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor
-                                                        ?.name)
+                                                             ?.name)
 
     component DescriptionLabel: Rectangle {
         id: descriptionLabel
@@ -234,7 +234,7 @@ Scope {
                     SessionButton {
                         id: sessionFirmwareReboot
 
-                        buttonText: "Reboot to firmare settings"
+                        buttonText: "Reboot to firmware settings"
                         buttonIcon: "settings_applications"
                         onClicked: {
                             onClicked: {
