@@ -13,21 +13,18 @@ import qs.Widgets
 Modal {
     id: root
 
-    property bool spotlightOpen: false
     property Component spotlightContent
 
     function show() {
-        spotlightOpen = true;
         open();
     }
 
     function hide() {
-        spotlightOpen = false;
         close();
     }
 
     function toggle() {
-        if (spotlightOpen) {
+        if (visible) {
             hide();
         } else {
             show();
@@ -37,11 +34,6 @@ Modal {
     modalWidth: 550
     modalHeight: 600
     content: spotlightContent
-    onVisibleChanged: {
-        if (visible && !spotlightOpen) {
-            show();
-        }
-    }
     onBackgroundClicked: {
         hide();
     }
@@ -269,7 +261,7 @@ Modal {
         name: "openLauncherModal"
 
         onPressed: {
-            root.open();
+            root.show();
         }
     }
 }

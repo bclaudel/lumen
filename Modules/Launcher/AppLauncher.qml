@@ -15,12 +15,7 @@ Item {
 
     function updateFilteredModel() {
         filteredModel.clear();
-        var apps = [];
-        if (searchQuery === "") {
-            apps = Services.AppSearchService.searchApplications(searchQuery);
-        } else {
-            apps = Services.AppSearchService.searchApplications(searchQuery);
-        }
+        var apps = Services.AppSearchService.searchApplications(searchQuery);
 
         if (searchQuery === "") {
             apps.sort((a, b) => {
@@ -38,6 +33,8 @@ Item {
                 return aName.localeCompare(bName);
             });
         }
+
+        selectedIndex = apps.length > 0 ? Math.min(selectedIndex, apps.length - 1) : 0;
 
         apps.forEach(app => {
             if (app) {
@@ -90,6 +87,23 @@ Item {
 
     Component.onCompleted: {
         updateFilteredModel();
+    }
+
+    Connections {
+        target: Services.AppSearchService
+
+        function onApplicationsChanged() {
+            root.updateFilteredModel();
+        }
+    }
+
+    Connections {
+        target: root.parent
+
+        function onVisibleChanged() {
+            if (root.parent?.visible)
+                root.updateFilteredModel();
+        }
     }
 
     ListModel {

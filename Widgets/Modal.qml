@@ -22,10 +22,18 @@ PanelWindow {
     signal backgroundClicked
 
     function close() {
+        if (!visible)
+            return;
+
         visible = false;
     }
 
     function open() {
+        if (visible) {
+            focusScope.forceActiveFocus();
+            return;
+        }
+
         visible = true;
         focusScope.forceActiveFocus();
     }
