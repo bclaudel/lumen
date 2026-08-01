@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 
+import qs.Modules.Background
 import qs.Modules.ControlCenter
 import qs.Modules.Session
 import qs.Modules.TopBar
@@ -8,6 +9,8 @@ import qs.Modules.Launcher
 
 ShellRoot {
     id: root
+
+    Background {}
 
     TopBar {
         controlCenterOpen: controlCenter.isOpen
