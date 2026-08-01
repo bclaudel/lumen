@@ -1,0 +1,76 @@
+pragma ComponentBehavior: Bound
+
+import QtQuick
+import Quickshell.Services.SystemTray as TrayService
+
+import qs.Common
+import qs.Widgets
+
+Rectangle {
+    id: root
+
+    property var screen
+    readonly property var trayItems: TrayService.SystemTray.items.values
+    readonly property var inlineItems: trayItems.filter(item => !SettingsData.isTrayOverflowOnly(
+                                                                    item)).slice(0,
+                                                                                 SettingsData.trayMaxVisibleItems)
+    readonly property var overflowItems: trayItems.filter(item => SettingsData.isTrayOverflowOnly(
+                                                                      item) || inlineItems.indexOf(
+                                                                      item) === -1)
+
+    signal menuRequested(var trayItem, var anchorItem, var screen)
+    signal overflowRequested(var anchorItem, var screen)
+
+    anchors.verticalCenter: parent.verticalCenter
+    color: Theme.widgetBackground
+    height: 30
+    radius: Theme.cornerRadius
+    visible: trayItems.length > 0
+    width: visible ? trayRow.width + 2 * Theme.spacingXS : 0
+
+    Row {
+        id: trayRow
+
+        anchors.centerIn: parent
+        spacing: Theme.spacingXS
+
+        Repeater {
+            model: root.inlineItems
+
+            TrayItem {
+                required property var modelData
+
+                trayItem: modelData
+
+                onMenuRequested: (trayItem, anchorItem) => {
+                    root.menuRequested(trayItem, anchorItem, root.screen);
+                }
+            }
+        }
+
+        Item {
+            id: overflowButton
+
+            height: 24
+            visible: root.overflowItems.length > 0
+            width: visible ? 24 : 0
+
+            MaterialIcon {
+                anchors.centerIn: parent
+                name: "expand_more"
+                size: Theme.iconSize - 4
+            }
+
+            StateLayer {
+                id: overflowArea
+
+                cornerRadius: Theme.cornerRadius
+                stateColor: Theme.primary
+
+                onClicked: {
+                    root.overflowRequested(root, root.screen);
+                }
+            }
+        }
+    }
+}

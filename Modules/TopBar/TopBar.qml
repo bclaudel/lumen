@@ -14,6 +14,8 @@ Variants {
     property real backgroundTransparency: SettingsData.topBarTransparency
 
     signal controlCenterRequested(var screen)
+    signal trayMenuRequested(var trayItem, var anchorItem, var screen)
+    signal trayOverflowRequested(var anchorItem, var screen)
 
     function formatDate(dateTime) {
         return Qt.formatDateTime(dateTime, "ddd MMM d  h:mmAP");
@@ -69,6 +71,17 @@ Variants {
                 anchors.verticalCenter: parent.verticalCenter
                 height: parent.height
                 spacing: Theme.spacingXS
+
+                SystemTray {
+                    screen: barWindow.modelData
+
+                    onMenuRequested: (trayItem, anchorItem, screen) => {
+                        root.trayMenuRequested(trayItem, anchorItem, screen);
+                    }
+                    onOverflowRequested: (anchorItem, screen) => {
+                        root.trayOverflowRequested(anchorItem, screen);
+                    }
+                }
 
                 ControlCenterButton {
                     active: root.controlCenterOpen && root.controlCenterScreen

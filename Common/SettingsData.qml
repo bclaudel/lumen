@@ -12,7 +12,13 @@ Singleton {
     property int maxWorkspaces: 8
     property string networkPreference: "auto"
     property real topBarTransparency: 0.75
+    property int trayMaxVisibleItems: 5
+    property var trayOverflowItemIds: ["Fcitx"]
     property string fontFamily: "Roboto"
+
+    function isTrayOverflowOnly(item) {
+        return item && root.trayOverflowItemIds.includes(item.id);
+    }
 
     function setNetworkPreference(preference) {
         root.networkPreference = preference;

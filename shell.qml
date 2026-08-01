@@ -14,13 +14,26 @@ ShellRoot {
         controlCenterScreen: controlCenter.targetScreen
 
         onControlCenterRequested: screen => {
+            systemTrayPopup.close();
             controlCenter.toggleControlCenter(screen);
+        }
+        onTrayMenuRequested: (trayItem, anchorItem, screen) => {
+            controlCenter.closeControlCenter();
+            systemTrayPopup.showMenu(trayItem, anchorItem, screen);
+        }
+        onTrayOverflowRequested: (anchorItem, screen) => {
+            controlCenter.closeControlCenter();
+            systemTrayPopup.showOverflow(anchorItem, screen);
         }
     }
 
     ControlCenter {
         id: controlCenter
 
+        onIsOpenChanged: {
+            if (controlCenter.isOpen)
+                systemTrayPopup.close();
+        }
         onLauncherRequested: screen => {
             controlCenter.closeControlCenter();
             launcher.show(screen);
@@ -37,5 +50,9 @@ ShellRoot {
 
     Launcher {
         id: launcher
+    }
+
+    SystemTrayPopup {
+        id: systemTrayPopup
     }
 }
