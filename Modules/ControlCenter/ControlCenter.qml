@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 
@@ -5,29 +7,59 @@ import Quickshell
 import Quickshell.Hyprland
 
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 PanelWindow {
     id: root
 
     property int controlCenterWidth: 460
+    property bool isOpen: false
+    property var targetScreen: null
 
     function closeControlCenter() {
-        SessionData.isControlCenterOpen = false;
+        isOpen = false;
     }
 
-    function openControlCenter() {
-        SessionData.isControlCenterOpen = true;
+    function openControlCenter(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        const screenChanged = targetScreen !== resolvedScreen;
+        if (screenChanged)
+            isOpen = false;
+        targetScreen = resolvedScreen;
+
+        if (screenChanged) {
+            Qt.callLater(() => {
+                if (ScreenService.isConnected(root.targetScreen))
+                    root.isOpen = true;
+            });
+        } else {
+            isOpen = true;
+        }
     }
 
-    function toggleControlCenter() {
-        SessionData.isControlCenterOpen = !SessionData.isControlCenterOpen;
+    function toggleControlCenter(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        if (isOpen && targetScreen === resolvedScreen)
+            closeControlCenter();
+        else
+            openControlCenter(resolvedScreen);
     }
+
+    signal launcherRequested(var screen)
+    signal sessionRequested(var screen)
 
     color: "transparent"
     exclusiveZone: 0
     implicitWidth: controlCenterWidth
-    visible: SessionData.isControlCenterOpen
+    screen: targetScreen
+    visible: isOpen
 
     anchors {
         bottom: true
@@ -38,7 +70,7 @@ PanelWindow {
     HyprlandFocusGrab {
         id: grab
 
-        active: SessionData.isControlCenterOpen
+        active: root.isOpen
         windows: [root]
 
         onCleared: () => {
@@ -49,9 +81,9 @@ PanelWindow {
     Loader {
         id: controlCenterLoader
 
-        active: SessionData.isControlCenterOpen
+        active: root.isOpen
         asynchronous: true
-        focus: SessionData.isControlCenterOpen
+        focus: root.isOpen
 
         sourceComponent: Component {
             Rectangle {
@@ -142,8 +174,7 @@ PanelWindow {
                                 iconSize: Theme.iconSize
 
                                 onClicked: {
-                                    Hyprland.dispatch(
-                                                'hl.dsp.global("quickshell:openLauncherModal")');
+                                    root.launcherRequested(root.targetScreen);
                                 }
                             }
 
@@ -154,8 +185,7 @@ PanelWindow {
                                 iconSize: Theme.iconSize
 
                                 onClicked: {
-                                    Hyprland.dispatch(
-                                                'hl.dsp.global("quickshell:sessionScreenOpen")');
+                                    root.sessionRequested(root.targetScreen);
                                 }
                             }
                         }
@@ -190,7 +220,7 @@ PanelWindow {
         name: "controlCenterOpen"
 
         onPressed: {
-            root.openControlCenter();
+            root.openControlCenter(ScreenService.focusedScreen);
         }
     }
 
@@ -208,7 +238,16 @@ PanelWindow {
         name: "controlCenterToggle"
 
         onPressed: {
-            root.toggleControlCenter();
+            root.toggleControlCenter(ScreenService.focusedScreen);
         }
+    }
+
+    Connections {
+        function onScreensChanged() {
+            if (root.isOpen && !ScreenService.isConnected(root.targetScreen))
+                root.closeControlCenter();
+        }
+
+        target: Quickshell
     }
 }

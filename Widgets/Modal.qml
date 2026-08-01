@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 
 import qs.Common
+import qs.Services
 
 PanelWindow {
     id: root
@@ -18,6 +19,7 @@ PanelWindow {
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 1
     property real cornerRadius: Theme.cornerRadius
+    property var targetScreen: null
 
     signal backgroundClicked
 
@@ -28,9 +30,28 @@ PanelWindow {
         visible = false;
     }
 
-    function open() {
-        if (visible) {
+    function open(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        if (visible && targetScreen === resolvedScreen) {
             focusScope.forceActiveFocus();
+            return;
+        }
+
+        const screenChanged = targetScreen !== resolvedScreen;
+        if (screenChanged)
+            visible = false;
+        targetScreen = resolvedScreen;
+
+        if (screenChanged) {
+            Qt.callLater(() => {
+                if (ScreenService.isConnected(root.targetScreen)) {
+                    root.visible = true;
+                    focusScope.forceActiveFocus();
+                }
+            });
             return;
         }
 
@@ -38,11 +59,19 @@ PanelWindow {
         focusScope.forceActiveFocus();
     }
 
-    function toggle() {
-        visible = !visible;
+    function toggle(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        if (visible && targetScreen === resolvedScreen)
+            close();
+        else
+            open(resolvedScreen);
     }
 
     color: "transparent"
+    screen: targetScreen
     visible: false
 
     WlrLayershell.exclusiveZone: -1
@@ -112,5 +141,14 @@ PanelWindow {
         Keys.onEscapePressed: event => {
             root.close();
         }
+    }
+
+    Connections {
+        function onScreensChanged() {
+            if (root.visible && !ScreenService.isConnected(root.targetScreen))
+                root.close();
+        }
+
+        target: Quickshell
     }
 }

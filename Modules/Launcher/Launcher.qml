@@ -8,6 +8,7 @@ import Quickshell.Hyprland
 import Quickshell.Widgets
 
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Modal {
@@ -15,20 +16,12 @@ Modal {
 
     property Component spotlightContent
 
-    function show() {
-        open();
+    function show(screen) {
+        root.open(screen);
     }
 
     function hide() {
-        close();
-    }
-
-    function toggle() {
-        if (visible) {
-            hide();
-        } else {
-            show();
-        }
+        root.close();
     }
 
     modalWidth: 550
@@ -261,7 +254,7 @@ Modal {
         name: "openLauncherModal"
 
         onPressed: {
-            root.show();
+            root.show(ScreenService.focusedScreen);
         }
     }
 }

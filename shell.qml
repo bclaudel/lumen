@@ -7,23 +7,35 @@ import qs.Modules.TopBar
 import qs.Modules.Launcher
 
 ShellRoot {
-    TopBar {}
+    id: root
 
-    LazyLoader {
-        loading: true
+    TopBar {
+        controlCenterOpen: controlCenter.isOpen
+        controlCenterScreen: controlCenter.targetScreen
 
-        component: ControlCenter {}
+        onControlCenterRequested: screen => {
+            controlCenter.toggleControlCenter(screen);
+        }
     }
 
-    LazyLoader {
-        active: true
+    ControlCenter {
+        id: controlCenter
 
-        component: Session {}
+        onLauncherRequested: screen => {
+            controlCenter.closeControlCenter();
+            launcher.show(screen);
+        }
+        onSessionRequested: screen => {
+            controlCenter.closeControlCenter();
+            session.openSessionScreen(screen);
+        }
     }
 
-    LazyLoader {
-        active: true
+    Session {
+        id: session
+    }
 
-        component: Launcher {}
+    Launcher {
+        id: launcher
     }
 }

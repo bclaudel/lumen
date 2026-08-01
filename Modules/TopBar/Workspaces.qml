@@ -9,7 +9,11 @@ Rectangle {
     id: root
 
     property int maxWorkspaces: SettingsData.maxWorkspaces
+    property var screen
     property var workspaces: getWorkspaces()
+    readonly property var monitor: Hyprland.monitors.values.find(monitor => monitor.name
+                                                                            === root.screen?.name)
+    readonly property int activeWorkspaceId: monitor?.activeWorkspace?.id ?? -1
 
     function activateWorkspace(workspaceIndex) {
         const workspace = workspaces[workspaceIndex];
@@ -67,7 +71,7 @@ Rectangle {
                 id: workspaceItem
 
                 required property int index
-                property bool isActive: root.workspaces[index]?.active ?? false
+                property bool isActive: root.activeWorkspaceId === index + 1
                 property bool isOccupied: root.workspaces[index] !== undefined
 
                 color: isActive ? Theme.primary : isOccupied ? Theme.surfaceTextAlpha :

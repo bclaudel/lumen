@@ -10,13 +10,14 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Scope {
     id: root
 
-    property var focusedScreen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor
-                                                             ?.name)
+    property alias isOpen: sessionLoader.active
+    property var targetScreen: null
 
     component DescriptionLabel: Rectangle {
         id: descriptionLabel
@@ -42,12 +43,35 @@ Scope {
         sessionLoader.active = false;
     }
 
-    function openSessionScreen() {
-        sessionLoader.active = true;
+    function openSessionScreen(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        const screenChanged = targetScreen !== resolvedScreen;
+        if (screenChanged)
+            sessionLoader.active = false;
+        targetScreen = resolvedScreen;
+
+        if (screenChanged) {
+            Qt.callLater(() => {
+                if (ScreenService.isConnected(root.targetScreen))
+                    sessionLoader.active = true;
+            });
+        } else {
+            sessionLoader.active = true;
+        }
     }
 
-    function toggleSessionScreen() {
-        sessionLoader.active = !sessionLoader.active;
+    function toggleSessionScreen(requestedScreen) {
+        const resolvedScreen = ScreenService.resolveScreen(requestedScreen);
+        if (!resolvedScreen)
+            return;
+
+        if (sessionLoader.active && targetScreen === resolvedScreen)
+            closeSessionScreen();
+        else
+            openSessionScreen(resolvedScreen);
     }
 
     Loader {
@@ -66,8 +90,9 @@ Scope {
             color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g,
                            Theme.surfaceContainer.b, Theme.opacityMedium)
             exclusionMode: ExclusionMode.Ignore
-            implicitHeight: root.focusedScreen?.height ?? 0
-            implicitWidth: root.focusedScreen?.width ?? 0
+            implicitHeight: root.targetScreen?.height ?? 0
+            implicitWidth: root.targetScreen?.width ?? 0
+            screen: root.targetScreen
             visible: sessionLoader.active
 
             anchors {
@@ -251,11 +276,11 @@ Scope {
         }
 
         function open(): void {
-            root.openSessionScreen();
+            root.openSessionScreen(ScreenService.focusedScreen);
         }
 
         function toggle(): void {
-            root.toggleSessionScreen();
+            root.toggleSessionScreen(ScreenService.focusedScreen);
         }
 
         target: "session"
@@ -266,7 +291,7 @@ Scope {
         name: "sessionScreenOpen"
 
         onPressed: {
-            root.openSessionScreen();
+            root.openSessionScreen(ScreenService.focusedScreen);
         }
     }
 
@@ -284,7 +309,16 @@ Scope {
         name: "sessionScreenToggle"
 
         onPressed: {
-            root.toggleSessionScreen();
+            root.toggleSessionScreen(ScreenService.focusedScreen);
         }
+    }
+
+    Connections {
+        function onScreensChanged() {
+            if (sessionLoader.active && !ScreenService.isConnected(root.targetScreen))
+                root.closeSessionScreen();
+        }
+
+        target: Quickshell
     }
 }

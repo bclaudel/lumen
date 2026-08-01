@@ -1,11 +1,15 @@
 import QtQuick
-import Quickshell.Hyprland
 import qs.Common
 import qs.Services
 import qs.Widgets
 
 Rectangle {
     id: root
+
+    property bool active: false
+    property var screen
+
+    signal clicked
 
     function getWifiSignalIcon(signalStrength) {
         switch (signalStrength) {
@@ -24,8 +28,8 @@ Rectangle {
 
     anchors.verticalCenter: parent.verticalCenter
     color: {
-        const baseColor = controlCenterArea.containsMouse || SessionData.isControlCenterOpen
-              ? Theme.primaryPressed : Theme.secondaryHover;
+        const baseColor = controlCenterArea.containsMouse || root.active ? Theme.primaryPressed :
+                                                                           Theme.secondaryHover;
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a
                        * Theme.widgetTransparency);
 
@@ -75,8 +79,6 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         hoverEnabled: true
 
-        onClicked: {
-            Hyprland.dispatch('hl.dsp.global("quickshell:controlCenterToggle")');
-        }
+        onClicked: root.clicked()
     }
 }
