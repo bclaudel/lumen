@@ -8,7 +8,8 @@ RippleButton {
     property string buttonIcon
     property real size: 120
 
-    backgroundColor: (button.focus || button.down) ? Theme.secondary : Theme.surfaceVariant
+    backgroundColor: (button.focus || button.down) ? Theme.buttonActiveBackground :
+                                                     Theme.buttonBackground
     buttonHeight: size
     buttonWidth: size
 

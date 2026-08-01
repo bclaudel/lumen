@@ -106,9 +106,7 @@ PanelWindow {
                                               0.08)
 
                         border.width: 1
-                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g,
-                                       Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha()
-                                       * 0.4)
+                        color: Theme.sectionBackground
                         radius: Theme.cornerRadius
 
                         Row {

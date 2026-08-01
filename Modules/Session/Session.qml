@@ -25,7 +25,7 @@ Scope {
         property string text
         property color textColor: Theme.surfaceText
 
-        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+        color: Theme.descriptionBackground
         radius: 18
         implicitHeight: descriptionLabelText.implicitHeight + Theme.spacingXL
         implicitWidth: descriptionLabelText.implicitWidth + Theme.spacingXL
@@ -87,8 +87,7 @@ Scope {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "quickshell:lockScreen"
-            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g,
-                           Theme.surfaceContainer.b, Theme.opacityMedium)
+            color: Theme.modalScrimBackground
             exclusionMode: ExclusionMode.Ignore
             implicitHeight: root.targetScreen?.height ?? 0
             implicitWidth: root.targetScreen?.width ?? 0

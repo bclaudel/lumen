@@ -12,8 +12,7 @@ StyledRect {
     property color iconColor: Theme.surfaceVariantText
     property color iconFocusedColor: Theme.primary
 
-    property color backgroundColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g,
-                                            Theme.surfaceContainer.b, 0.9)
+    property color backgroundColor: Theme.inputBackground
     property color focusedBorderColor: Theme.primary
     property color normalBorderColor: Theme.outlineStrong
     property color placeholderColor: Theme.outlineButton

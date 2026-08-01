@@ -5,10 +5,10 @@ import qs.Common
 Button {
     id: root
 
-    property color backgroundColor: Theme.surfaceVariant
-    property color backgroundHover: Theme.secondary
-    property color backgroundToggled: Theme.secondary
-    property color backgroundToggledHover: Theme.secondary
+    property color backgroundColor: Theme.buttonBackground
+    property color backgroundHover: Theme.buttonActiveBackground
+    property color backgroundToggled: Theme.buttonActiveBackground
+    property color backgroundToggledHover: Theme.buttonActiveBackground
     property color buttonColor: root.enabled ? (root.toggled ? (root.hovered
                                                                 ? backgroundToggledHover :
                                                                   backgroundToggled) : (

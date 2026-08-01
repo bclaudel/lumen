@@ -10,7 +10,11 @@ Singleton {
     property int currentThemeIndex: 0
     property color archBlue: "#1793D1"
     property real barHeight: 48
+    property color buttonActiveBackground: secondary
+    property color buttonBackground: surfaceVariant
+    property color contentBackground: withAlpha(surfaceVariant, 0.1)
     property real cornerRadius: 12
+    property color descriptionBackground: withAlpha(surfaceVariant, 0.5)
     property color error: "#F2B8B5"
     property color errorHover: Qt.rgba(error.r, error.g, error.b, 0.12)
     property color errorPressed: Qt.rgba(error.r, error.g, error.b, 0.9)
@@ -23,6 +27,9 @@ Singleton {
     property real iconSizeLarge: 32
     property real iconSizeSmall: 16
     property color info: "#2196F3"
+    property color inputBackground: withAlpha(surfaceContainer, 0.9)
+    property color itemBackground: withAlpha(surfaceVariant, 0.03)
+    property color modalScrimBackground: withAlpha(surfaceContainer, opacityMedium)
     property real opacityDisabled: 0.38
     property real opacityFull: 1
     property real opacityHigh: 0.87
@@ -35,6 +42,7 @@ Singleton {
     property color outlineSelected: Qt.rgba(outline.r, outline.g, outline.b, 0.2)
     property color outlineStrong: Qt.rgba(outline.r, outline.g, outline.b, 0.12)
     property real panelTransparency: 0.85
+    property color popupInputBackground: withAlpha(surfaceVariant, popupTransparency * 0.7)
     property real popupTransparency: 0.92
     property color primary: getCurrentTheme().primary
     property color primaryBackground: Qt.rgba(primary.r, primary.g, primary.b, 0.04)
@@ -46,6 +54,7 @@ Singleton {
     property color primaryText: getCurrentTheme().primaryText
     property color secondary: getCurrentTheme().secondary
     property color secondaryHover: Qt.rgba(secondary.r, secondary.g, secondary.b, 0.08)
+    property color sectionBackground: withAlpha(surfaceVariant, popupTransparency * 0.4)
     property real spacingL: 16
     property real spacingM: 12
     property real spacingS: 8
@@ -129,6 +138,8 @@ Singleton {
     ]
     property color warning: "#FF9800"
     property color warningHover: Qt.rgba(warning.r, warning.g, warning.b, 0.12)
+    property color widgetActiveBackground: withAlpha(primary, primaryPressed.a * widgetTransparency)
+    property color widgetBackground: withAlpha(secondary, secondaryHover.a * widgetTransparency)
     property real widgetTransparency: 0.85
 
     function getContentBackgroundAlpha() {
@@ -144,7 +155,14 @@ Singleton {
     }
 
     function popupBackground() {
-        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b,
-                       popupTransparency);
+        return withAlpha(surfaceContainer, popupTransparency);
+    }
+
+    function topBarBackground(transparency) {
+        return withAlpha(surfaceContainer, transparency);
+    }
+
+    function withAlpha(color, alpha) {
+        return Qt.rgba(color.r, color.g, color.b, alpha);
     }
 }

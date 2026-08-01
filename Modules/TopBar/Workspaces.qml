@@ -36,12 +36,7 @@ Rectangle {
     }
 
     anchors.verticalCenter: parent.verticalCenter
-    color: {
-        const baseColor = Theme.secondaryHover;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a
-                       * Theme.widgetTransparency);
-
-    }
+    color: Theme.widgetBackground
     height: 30
     radius: Theme.cornerRadius
     width: workspacesRow.width + 2 * Theme.spacingM

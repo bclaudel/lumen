@@ -27,13 +27,8 @@ Rectangle {
     }
 
     anchors.verticalCenter: parent.verticalCenter
-    color: {
-        const baseColor = controlCenterArea.containsMouse || root.active ? Theme.primaryPressed :
-                                                                           Theme.secondaryHover;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a
-                       * Theme.widgetTransparency);
-
-    }
+    color: controlCenterArea.containsMouse || root.active ? Theme.widgetActiveBackground :
+                                                            Theme.widgetBackground
     height: 30
     radius: Theme.cornerRadius
     width: controlCenterRow.width + 2 * Theme.spacingM

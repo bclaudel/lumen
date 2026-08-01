@@ -88,8 +88,7 @@ PanelWindow {
         id: background
 
         anchors.fill: parent
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b,
-                       Theme.opacityMedium)
+        color: Theme.modalScrimBackground
 
         MouseArea {
             anchors.fill: parent

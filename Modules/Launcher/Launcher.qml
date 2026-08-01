@@ -77,9 +77,7 @@ Modal {
                         width: parent.width
                         height: 56
                         focus: true
-                        backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g,
-                                                 Theme.surfaceVariant.b,
-                                                 Theme.getContentBackgroundAlpha() * 0.7)
+                        backgroundColor: Theme.popupInputBackground
                         normalBorderColor: Theme.outlineMedium
                         focusedBorderColor: Theme.primary
                         iconName: "search"
@@ -101,7 +99,7 @@ Modal {
                     width: parent.width
                     height: parent.height - y
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceLight
+                    color: Theme.contentBackground
                     border.color: Theme.outlineLight
                     border.width: 1
 
@@ -157,10 +155,8 @@ Modal {
                             radius: Theme.cornerRadius
                             color: ListView.isCurrentItem ? Theme.primaryPressed :
                                                             listMouseArea.containsMouse
-                                                            ? Theme.primaryHoverLight : Qt.rgba(
-                                                                  Theme.surfaceVariant.r,
-                                                                  Theme.surfaceVariant.g,
-                                                                  Theme.surfaceVariant.b, 0.03)
+                                                            ? Theme.primaryHoverLight :
+                                                              Theme.itemBackground
                             border.color: ListView.isCurrentItem ? Theme.primarySelected :
                                                                    Theme.outlineMedium
                             border.width: ListView.isCurrentItem ? 2 : 1
@@ -186,7 +182,7 @@ Modal {
                                     Rectangle {
                                         anchors.fill: parent
                                         visible: !listIconImg.visible
-                                        color: Theme.surfaceLight
+                                        color: Theme.contentBackground
                                         radius: Theme.cornerRadius
                                         border.color: Theme.primarySelected
                                         border.width: 1

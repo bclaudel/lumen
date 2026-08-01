@@ -26,7 +26,7 @@ Variants {
 
         required property var modelData
 
-        color: Theme.popupBackground()
+        color: Theme.topBarBackground(root.backgroundTransparency)
         implicitHeight: Theme.barHeight - 4
         screen: modelData
 
@@ -83,9 +83,7 @@ Variants {
 
             Rectangle {
                 anchors.centerIn: parent
-                color: Qt.rgba(Theme.secondaryHover.r, Theme.secondaryHover.g,
-                               Theme.secondaryHover.b, Theme.secondaryHover.a
-                               * Theme.widgetTransparency)
+                color: Theme.widgetBackground
                 height: 30
                 radius: Theme.cornerRadius
                 width: dateLabel.implicitWidth + 2 * Theme.spacingM

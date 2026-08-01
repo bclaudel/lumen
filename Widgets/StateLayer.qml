@@ -17,10 +17,9 @@ MouseArea {
         id: hoverLayer
 
         anchors.fill: parent
-        color: Qt.rgba(root.stateColor.r, root.stateColor.g, root.stateColor.b, root.disabled ? 0 :
-                                                                                                root.pressed
-                                                                                                ? 0.12 : root.containsMouse
-                                                                                                  ? 0.08 : 0)
+        color: Theme.withAlpha(root.stateColor, root.disabled ? 0 : root.pressed ? 0.12 :
+                                                                                   root.containsMouse
+                                                                                   ? 0.08 : 0)
         radius: root.cornerRadius
     }
 }
