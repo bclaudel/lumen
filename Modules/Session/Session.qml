@@ -146,7 +146,7 @@ Scope {
 
                 GridLayout {
                     columnSpacing: Theme.spacingL + 4
-                    columns: 3
+                    columns: 4
                     rowSpacing: Theme.spacingL + 4
 
                     SessionButton {
@@ -164,7 +164,26 @@ Scope {
                             sessionRoot.subtitle = buttonText;
                         }
 
+                        KeyNavigation.down: sessionHibernate
+                        KeyNavigation.right: sessionSleep
+                    }
+
+                    SessionButton {
+                        id: sessionSleep
+
+                        buttonText: "Sleep"
+                        buttonIcon: "dark_mode"
+                        onClicked: {
+                            Quickshell.execDetached(["systemctl", "suspend"]);
+                            root.closeSessionScreen();
+                        }
+                        onFocusChanged: {
+                            if (focus)
+                            sessionRoot.subtitle = buttonText;
+                        }
+
                         KeyNavigation.down: sessionShutdown
+                        KeyNavigation.left: sessionLock
                         KeyNavigation.right: sessionLogout
                     }
 
@@ -183,8 +202,26 @@ Scope {
                         }
 
                         KeyNavigation.down: sessionReboot
-                        KeyNavigation.left: sessionLock
-                        KeyNavigation.right: sessionHibernate
+                        KeyNavigation.left: sessionSleep
+                        KeyNavigation.right: sessionTaskManager
+                    }
+
+                    SessionButton {
+                        id: sessionTaskManager
+
+                        buttonText: "Task Manager"
+                        buttonIcon: "browse_activity"
+                        onClicked: {
+                            Quickshell.execDetached(["gnome-system-monitor"]);
+                            root.closeSessionScreen();
+                        }
+                        onFocusChanged: {
+                            if (focus)
+                            sessionRoot.subtitle = buttonText;
+                        }
+
+                        KeyNavigation.down: sessionFirmwareReboot
+                        KeyNavigation.left: sessionLogout
                     }
 
                     SessionButton {
@@ -201,8 +238,8 @@ Scope {
                             sessionRoot.subtitle = buttonText;
                         }
 
-                        KeyNavigation.down: sessionFirmwareReboot
-                        KeyNavigation.left: sessionLogout
+                        KeyNavigation.right: sessionShutdown
+                        KeyNavigation.up: sessionLock
                     }
 
                     SessionButton {
@@ -219,8 +256,9 @@ Scope {
                             sessionRoot.subtitle = buttonText;
                         }
 
+                        KeyNavigation.left: sessionHibernate
                         KeyNavigation.right: sessionReboot
-                        KeyNavigation.up: sessionLock
+                        KeyNavigation.up: sessionSleep
                     }
 
                     SessionButton {
@@ -257,7 +295,7 @@ Scope {
                         }
 
                         KeyNavigation.left: sessionReboot
-                        KeyNavigation.up: sessionHibernate
+                        KeyNavigation.up: sessionTaskManager
                     }
                 }
 
