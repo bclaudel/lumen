@@ -193,7 +193,8 @@ Scope {
                         buttonText: "Logout"
                         buttonIcon: "logout"
                         onClicked: {
-                            Quickshell.execDetached(["uwsm", "stop"]);
+                            Quickshell.execDetached(["hyprctl", "eval",
+                                                     "return hl.dispatch(hl.dsp.exit())"]);
                             root.closeSessionScreen();
                         }
                         onFocusChanged: {
