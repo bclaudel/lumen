@@ -11,12 +11,14 @@ Rectangle {
 
     property var screen
     readonly property var trayItems: TrayService.SystemTray.items.values
-    readonly property var inlineItems: trayItems.filter(item => !SettingsData.isTrayOverflowOnly(
-                                                                    item)).slice(0,
-                                                                                 SettingsData.trayMaxVisibleItems)
-    readonly property var overflowItems: trayItems.filter(item => SettingsData.isTrayOverflowOnly(
-                                                                      item) || inlineItems.indexOf(
-                                                                      item) === -1)
+    readonly property var visibleTrayItems: trayItems.filter(item => item.status
+                                                                     !== TrayService.Status.Passive)
+    readonly property var inlineItems: visibleTrayItems.filter(item =>
+    !SettingsData.isTrayOverflowOnly(item)).slice(0, SettingsData.trayMaxVisibleItems)
+    readonly property var overflowItems: visibleTrayItems.filter(item
+                                                                 => SettingsData.isTrayOverflowOnly(
+                                                                        item) || inlineItems.indexOf(
+                                                                        item) === -1)
 
     signal menuRequested(var trayItem, var anchorItem, var screen)
     signal overflowRequested(var anchorItem, var screen)
@@ -25,7 +27,7 @@ Rectangle {
     color: Theme.widgetBackground
     height: 30
     radius: Theme.cornerRadius
-    visible: trayItems.length > 0
+    visible: visibleTrayItems.length > 0
     width: visible ? trayRow.width + 2 * Theme.spacingXS : 0
 
     Row {
