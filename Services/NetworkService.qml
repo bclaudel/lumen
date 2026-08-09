@@ -9,7 +9,19 @@ Singleton {
     id: root
 
     property string networkStatus: "disconnected" // "ethernet", "wifi", "disconnected"
+    property bool wifiEnabled: false
+    property string wifiSsid: ""
     property string wifiSignalStrengthStr: "excellent"
+
+    function openWifiSettings() {
+        Quickshell.execDetached(["nm-connection-editor"]);
+    }
+
+    function setWifiEnabled(enabled) {
+        Quickshell.execDetached(["nmcli", "radio", "wifi", enabled ? "on" : "off"]);
+        wifiEnabled = enabled;
+        refreshTimer.restart();
+    }
 
     function getSignalQuality(strength) {
         if (strength >= 75)
@@ -24,6 +36,8 @@ Singleton {
     function refreshNetworkState() {
         if (!networkStatusQuery.running)
             networkStatusQuery.running = true;
+        if (!wifiRadioQuery.running)
+            wifiRadioQuery.running = true;
     }
 
     Component.onCompleted: {
@@ -139,9 +153,29 @@ Singleton {
     }
 
     Process {
+        id: wifiRadioQuery
+
+        command: ["nmcli", "-t", "-f", "WIFI", "radio"]
+        running: false
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                if (text.trim() !== "")
+                root.wifiEnabled = false;
+            }
+        }
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.wifiEnabled = text.trim() === "enabled";
+            }
+        }
+    }
+
+    Process {
         id: wifiSignalQuery
 
-        command: ["nmcli", "-t", "-f", "ACTIVE,SIGNAL", "dev", "wifi"]
+        command: ["nmcli", "-t", "--escape", "no", "-f", "ACTIVE,SIGNAL,SSID", "dev", "wifi"]
         running: false
 
         stdout: StdioCollector {
@@ -152,15 +186,24 @@ Singleton {
                     if (!line)
                     continue;
 
-                    const parts = line.split(":");
-                    if ((parts[0] || "") === "yes") {
-                        activeSignal = parseInt(parts[1]) || 0;
+                    const firstSeparator = line.indexOf(":");
+                    const secondSeparator = line.indexOf(":", firstSeparator + 1);
+                    if (firstSeparator < 0 || secondSeparator < 0)
+                    continue;
+
+                    if (line.slice(0, firstSeparator) === "yes") {
+                        activeSignal = parseInt(line.slice(firstSeparator + 1, secondSeparator))
+                        || 0;
+                        root.wifiSsid = line.slice(secondSeparator + 1);
                         break;
                     }
                 }
 
-                if (activeSignal >= 0)
-                root.wifiSignalStrengthStr = root.getSignalQuality(activeSignal);
+                if (activeSignal >= 0) {
+                    root.wifiSignalStrengthStr = root.getSignalQuality(activeSignal);
+                } else {
+                    root.wifiSsid = "";
+                }
             }
         }
     }

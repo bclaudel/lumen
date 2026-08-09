@@ -5,15 +5,16 @@ import QtQuick.Layouts
 
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 
 import qs.Common
 import qs.Services
-import qs.Widgets
 
 PanelWindow {
     id: root
 
-    property int controlCenterWidth: 460
+    property int controlCenterHeight: 414
+    property int controlCenterWidth: 420
     property bool isOpen: false
     property var targetScreen: null
 
@@ -30,6 +31,9 @@ PanelWindow {
         if (screenChanged)
             isOpen = false;
         targetScreen = resolvedScreen;
+        BrightnessService.setTargetScreen(resolvedScreen);
+        BrightnessService.refreshCurrentValue();
+        NetworkService.refreshNetworkState();
 
         if (screenChanged) {
             Qt.callLater(() => {
@@ -55,17 +59,26 @@ PanelWindow {
     signal launcherRequested(var screen)
     signal sessionRequested(var screen)
 
+    onIsOpenChanged: {
+        BrightnessService.monitoring = isOpen;
+        if (isOpen)
+        BrightnessService.refreshCurrentValue();
+    }
+
     color: "transparent"
     exclusiveZone: 0
+    implicitHeight: controlCenterHeight
     implicitWidth: controlCenterWidth
     screen: targetScreen
     visible: isOpen
 
     anchors {
-        bottom: true
         right: true
         top: true
     }
+
+    WlrLayershell.margins.right: SettingsData.hyprlandGapsOut
+    WlrLayershell.margins.top: Theme.barHeight + SettingsData.hyprlandGapsOut
 
     HyprlandFocusGrab {
         id: grab
@@ -82,6 +95,7 @@ PanelWindow {
         id: controlCenterLoader
 
         active: root.isOpen
+        anchors.fill: parent
         asynchronous: true
         focus: root.isOpen
 
@@ -89,108 +103,101 @@ PanelWindow {
             Rectangle {
                 id: controlCenterBackground
 
-                anchors.fill: parent
-                color: Theme.popupBackground()
-                radius: Theme.cornerRadius
+                border.color: Theme.withAlpha(Theme.outline, 0.16)
+                border.width: 1
+                color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
+                radius: Theme.cornerRadius + 12
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    border.color: Theme.withAlpha(Theme.surfaceText, 0.05)
+                    border.width: 1
+                    color: "transparent"
+                    radius: parent.radius - 1
+                }
 
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
 
-                    Rectangle {
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 90
+                        Layout.preferredHeight: 174
+                        spacing: Theme.spacingM
 
-                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b,
-                                              0.08)
+                        ColumnLayout {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            spacing: Theme.spacingM
 
-                        border.width: 1
-                        color: Theme.sectionBackground
-                        radius: Theme.cornerRadius
-
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingL
-                            anchors.rightMargin: Theme.spacingL
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingL
-
-                            Item {
-                                id: avatarContainer
-
-                                height: 64
-                                width: 64
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    border.color: Theme.primary
-                                    border.width: 1
-                                    color: "transparent"
-                                    radius: width / 2
-                                    visible: true
+                            ControlCard {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                active: NetworkService.wifiEnabled
+                                iconName: NetworkService.wifiEnabled ? "wifi" : "wifi_off"
+                                subtitle: {
+                                    if (!NetworkService.wifiEnabled)
+                                    return "Off";
+                                    if (NetworkService.networkStatus === "wifi"
+                                        && NetworkService.wifiSsid)
+                                    return NetworkService.wifiSsid;
+                                    return "On";
                                 }
+                                title: "Wi-Fi"
+
+                                onOpenRequested: NetworkService.openWifiSettings()
+                                onToggleRequested: NetworkService.setWifiEnabled(
+                                                       !NetworkService.wifiEnabled)
                             }
 
-                            Column {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingXS
+                            ControlCard {
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                active: BluetoothService.enabled
+                                available: BluetoothService.available
+                                iconName: "bluetooth"
+                                subtitle: BluetoothService.statusText
+                                title: "Bluetooth"
 
-                                StyledText {
-                                    color: Theme.surfaceText
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    font.weight: Font.Medium
-                                    text: "Ekko"
-                                }
-
-                                StyledText {
-                                    color: Theme.surfaceText
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    font.weight: Font.Normal
-                                    text: "Unknown"
-                                }
+                                onOpenRequested: BluetoothService.openSettings()
+                                onToggleRequested: BluetoothService.setEnabled(
+                                                       !BluetoothService.enabled)
                             }
                         }
 
-                        Row {
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.spacingL
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingS
-
-                            MaterialButton {
-                                buttonSize: 40
-                                iconColor: Theme.surfaceText
-                                iconName: "restart_alt"
-                                iconSize: Theme.iconSize
-                            }
-
-                            MaterialButton {
-                                buttonSize: 40
-                                iconColor: Theme.surfaceText
-                                iconName: "settings"
-                                iconSize: Theme.iconSize
-
-                                onClicked: {
-                                    root.launcherRequested(root.targetScreen);
-                                }
-                            }
-
-                            MaterialButton {
-                                buttonSize: 40
-                                iconColor: Theme.surfaceText
-                                iconName: "power_settings_new"
-                                iconSize: Theme.iconSize
-
-                                onClicked: {
-                                    root.sessionRequested(root.targetScreen);
-                                }
-                            }
+                        MediaCard {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
                         }
                     }
 
-                    Item {
-                        Layout.fillHeight: true
+                    ControlSlider {
+                        Layout.fillWidth: true
+                        available: BrightnessService.available
+                        iconName: "brightness_6"
+                        statusText: Math.round(BrightnessService.value * 100) + "%"
+                        title: "Display"
+                        unavailableText: BrightnessService.detecting ? "Detecting…" : "Unavailable"
+                        value: BrightnessService.value
+
+                        onValueEdited: value => BrightnessService.setBrightness(value)
+                    }
+
+                    ControlSlider {
+                        Layout.fillWidth: true
+                        actionIconName: AudioService.muted ? "volume_off" : "volume_up"
+                        actionVisible: true
+                        available: AudioService.available
+                        iconName: AudioService.muted ? "volume_off" : "volume_up"
+                        statusText: AudioService.muted ? "Muted" : Math.round(AudioService.volume
+                                                                              * 100) + "%"
+                        title: "Sound"
+                        value: AudioService.volume
+
+                        onActionRequested: AudioService.toggleMuted()
+                        onValueEdited: value => AudioService.setVolume(value)
                     }
                 }
             }
@@ -199,17 +206,6 @@ PanelWindow {
         Keys.onPressed: event => {
             if (event.key === Qt.Key_Escape)
                 root.closeControlCenter();
-        }
-
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: SettingsData.hyprlandGapsOut
-            left: parent.left
-            leftMargin: SettingsData.hyprlandGapsOut
-            right: parent.right
-            rightMargin: SettingsData.hyprlandGapsOut
-            top: parent.top
-            topMargin: SettingsData.hyprlandGapsOut
         }
     }
 
