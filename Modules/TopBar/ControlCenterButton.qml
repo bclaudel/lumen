@@ -46,8 +46,8 @@ Rectangle {
         }
 
         MaterialIcon {
-            color: Theme.surfaceText
-            name: "bluetooth"
+            color: BluetoothService.enabled ? Theme.surfaceText : Theme.outlineButton
+            name: BluetoothService.enabled ? "bluetooth" : "bluetooth_disabled"
             size: Theme.iconSize - 4
         }
 
