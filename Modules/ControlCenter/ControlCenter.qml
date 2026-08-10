@@ -13,7 +13,7 @@ import qs.Services
 PanelWindow {
     id: root
 
-    property int controlCenterHeight: 414
+    property int controlCenterHeight: 484
     property int controlCenterWidth: 420
     property bool isOpen: false
     property var targetScreen: null
@@ -120,6 +120,14 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
+
+                    ControlCenterHeader {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 58
+                        targetScreen: root.targetScreen
+
+                        onSessionRequested: screen => root.sessionRequested(screen)
+                    }
 
                     RowLayout {
                         Layout.fillWidth: true
