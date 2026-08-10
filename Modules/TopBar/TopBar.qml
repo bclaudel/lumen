@@ -83,6 +83,10 @@ Variants {
                     }
                 }
 
+                WifiButton {}
+
+                BluetoothButton {}
+
                 ControlCenterButton {
                     active: root.controlCenterOpen && root.controlCenterScreen
                             === barWindow.modelData
