@@ -97,7 +97,7 @@ Variants {
             Rectangle {
                 anchors.centerIn: parent
                 color: Theme.widgetBackground
-                height: 30
+                height: Theme.topBarWidgetHeight
                 radius: Theme.cornerRadius
                 width: dateLabel.implicitWidth + 2 * Theme.spacingM
 

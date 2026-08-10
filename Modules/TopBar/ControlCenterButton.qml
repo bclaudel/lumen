@@ -29,7 +29,7 @@ Rectangle {
     anchors.verticalCenter: parent.verticalCenter
     color: controlCenterArea.containsMouse || root.active ? Theme.widgetActiveBackground :
                                                             Theme.widgetBackground
-    height: 30
+    height: Theme.topBarWidgetHeight
     radius: Theme.cornerRadius
     width: controlCenterRow.width + 2 * Theme.spacingM
 

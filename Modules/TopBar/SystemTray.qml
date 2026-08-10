@@ -25,7 +25,7 @@ Rectangle {
 
     anchors.verticalCenter: parent.verticalCenter
     color: Theme.widgetBackground
-    height: 30
+    height: Theme.topBarWidgetHeight
     radius: Theme.cornerRadius
     visible: visibleTrayItems.length > 0
     width: visible ? trayRow.width + 2 * Theme.spacingXS : 0

@@ -10,6 +10,7 @@ Rectangle {
 
     property int maxWorkspaces: SettingsData.maxWorkspaces
     property var screen
+    property real contentScale: 0.925
     property var workspaces: getWorkspaces()
     readonly property var monitor: Hyprland.monitors.values.find(monitor => monitor.name
                                                                             === root.screen?.name)
@@ -37,7 +38,7 @@ Rectangle {
 
     anchors.verticalCenter: parent.verticalCenter
     color: Theme.widgetBackground
-    height: 30
+    height: Theme.topBarWidgetHeight
     radius: Theme.cornerRadius
     width: workspacesRow.width + 2 * Theme.spacingM
 
@@ -57,7 +58,7 @@ Rectangle {
         id: workspacesRow
 
         anchors.centerIn: parent
-        spacing: Theme.spacingS
+        spacing: Theme.spacingS * root.contentScale
 
         Repeater {
             model: root.maxWorkspaces
@@ -71,10 +72,10 @@ Rectangle {
 
                 color: isActive ? Theme.primary : isOccupied ? Theme.surfaceTextAlpha :
                                                                Theme.surfaceTextLight
-                height: Theme.spacingL
+                height: Theme.spacingL * root.contentScale
                 radius: height / 2
-                width: isActive ? Theme.spacingXL + Theme.spacingM : Theme.spacingL
-                                  + Theme.spacingXS
+                width: (isActive ? Theme.spacingXL + Theme.spacingM : Theme.spacingL
+                                   + Theme.spacingXS) * root.contentScale
 
                 MouseArea {
                     anchors.fill: parent
