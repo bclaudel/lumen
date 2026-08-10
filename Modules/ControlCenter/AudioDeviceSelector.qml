@@ -13,7 +13,7 @@ import qs.Widgets
 ControlCenterSurface {
     id: root
 
-    readonly property int delegateHeight: 52
+    readonly property int delegateHeight: 40
     readonly property int headerHeight: 36
     property int maximumHeight: 230
     property bool selectingInput: false
@@ -44,6 +44,8 @@ ControlCenterSurface {
         }
 
         ListView {
+            id: deviceList
+
             Layout.fillHeight: true
             Layout.fillWidth: true
             clip: true
@@ -51,6 +53,27 @@ ControlCenterSurface {
                 values: root.selectedDevices
             }
             spacing: Theme.spacingXS
+
+            Controls.ScrollBar.vertical: Controls.ScrollBar {
+                minimumSize: height > 0 ? Math.min(1, 24 / height) : 1
+                padding: 0
+                policy: deviceList.contentHeight > deviceList.height ? Controls.ScrollBar.AlwaysOn :
+                                                                       Controls.ScrollBar.AlwaysOff
+                width: 3
+
+                background: Rectangle {
+                    color: Theme.withAlpha(Theme.surfaceText, 0.12)
+                    implicitWidth: 3
+                    radius: width / 2
+                }
+
+                contentItem: Rectangle {
+                    color: Theme.withAlpha(Theme.surfaceText, 0.65)
+                    implicitHeight: 24
+                    implicitWidth: 3
+                    radius: width / 2
+                }
+            }
 
             delegate: Controls.AbstractButton {
                 id: deviceDelegate
@@ -81,8 +104,8 @@ ControlCenterSurface {
 
                     Rectangle {
                         Layout.leftMargin: Theme.spacingS
-                        Layout.preferredHeight: 36
-                        Layout.preferredWidth: 36
+                        Layout.preferredHeight: 28
+                        Layout.preferredWidth: 28
                         color: deviceDelegate.modelData === root.selectedDevice ? Theme.primary :
                                                                                   Theme.withAlpha(
                                                                                       Theme.surfaceText,
