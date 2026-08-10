@@ -13,9 +13,17 @@ import qs.Services
 PanelWindow {
     id: root
 
-    property int controlCenterHeight: 484
+    property int audioDeviceExpansionHeight: 0
+    readonly property int audioDeviceSelectorMaximumHeight: 230
+    property bool audioDeviceSelectorOpen: false
+    readonly property int baseControlCenterHeight: 578
+    readonly property int controlCenterHeight: baseControlCenterHeight + audioDeviceExpansionHeight
     property int controlCenterWidth: 420
+    readonly property int maximumControlCenterHeight: baseControlCenterHeight + Theme.spacingM
+                                                      + audioDeviceSelectorMaximumHeight
+    readonly property int transitionDuration: 160
     property bool isOpen: false
+    property bool selectingInput: false
     property var targetScreen: null
 
     function closeControlCenter() {
@@ -60,14 +68,20 @@ PanelWindow {
 
     onIsOpenChanged: {
         BrightnessService.monitoring = isOpen;
-        if (isOpen)
-        BrightnessService.refreshCurrentValue();
+        if (isOpen) {
+            BrightnessService.refreshCurrentValue();
+        } else {
+            audioDeviceSelectorOpen = false;
+        }
     }
 
     color: "transparent"
     exclusiveZone: 0
-    implicitHeight: controlCenterHeight
+    implicitHeight: maximumControlCenterHeight
     implicitWidth: controlCenterWidth
+    mask: Region {
+        item: controlCenterLoader
+    }
     screen: targetScreen
     visible: isOpen
 
@@ -94,9 +108,20 @@ PanelWindow {
         id: controlCenterLoader
 
         active: true
-        anchors.fill: parent
+        anchors.right: parent.right
+        anchors.top: parent.top
         asynchronous: true
+        clip: true
         focus: root.isOpen
+        height: root.controlCenterHeight
+        width: root.controlCenterWidth
+
+        Behavior on height {
+            NumberAnimation {
+                duration: root.transitionDuration
+                easing.type: Easing.OutCubic
+            }
+        }
 
         sourceComponent: Component {
             Rectangle {
@@ -117,8 +142,13 @@ PanelWindow {
                 }
 
                 ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingL
+                    anchors.top: parent.top
+                    anchors.topMargin: Theme.spacingL
+                    height: implicitHeight
                     spacing: Theme.spacingM
 
                     ControlCenterHeader {
@@ -182,6 +212,7 @@ PanelWindow {
 
                     ControlSlider {
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 92
                         available: BrightnessService.available
                         iconName: "brightness_6"
                         statusText: Math.round(BrightnessService.value * 100) + "%"
@@ -194,6 +225,7 @@ PanelWindow {
 
                     ControlSlider {
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 92
                         actionIconName: AudioService.muted ? "volume_off" : "volume_up"
                         actionVisible: true
                         available: AudioService.available
@@ -206,13 +238,42 @@ PanelWindow {
                         onActionRequested: AudioService.toggleMuted()
                         onValueEdited: value => AudioService.setVolume(value)
                     }
+
+                    AudioDeviceRow {
+                        id: audioDeviceRow
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: implicitHeight
+                        expanded: root.audioDeviceSelectorOpen
+                        maximumSelectorHeight: root.audioDeviceSelectorMaximumHeight
+                        panelOpen: root.isOpen
+                        selectingInput: root.selectingInput
+
+                        onSelectionRequested: input => {
+                            if (root.audioDeviceSelectorOpen && root.selectingInput === input) {
+                                root.audioDeviceSelectorOpen = false;
+                            } else {
+                                root.selectingInput = input;
+                                root.audioDeviceSelectorOpen = true;
+                            }
+                        }
+
+                        onDeviceSelected: root.audioDeviceSelectorOpen = false
+                        onExpansionHeightChanged: root.audioDeviceExpansionHeight = expansionHeight
+                    }
                 }
             }
         }
 
         Keys.onPressed: event => {
-            if (event.key === Qt.Key_Escape)
+            if (event.key !== Qt.Key_Escape)
+                return;
+
+            if (root.audioDeviceSelectorOpen)
+                root.audioDeviceSelectorOpen = false;
+            else
                 root.closeControlCenter();
+            event.accepted = true;
         }
     }
 
