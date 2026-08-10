@@ -3,6 +3,7 @@ import Quickshell
 
 import qs.Modules.Background
 import qs.Modules.ControlCenter
+import qs.Modules.OnScreenDisplay
 import qs.Modules.Session
 import qs.Modules.TopBar
 import qs.Modules.Launcher
@@ -45,6 +46,10 @@ ShellRoot {
             controlCenter.closeControlCenter();
             session.openSessionScreen(screen);
         }
+    }
+
+    OnScreenDisplay {
+        suppressed: controlCenter.isOpen
     }
 
     Session {
