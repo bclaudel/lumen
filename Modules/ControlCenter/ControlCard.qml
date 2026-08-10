@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
 
-Rectangle {
+ControlCenterSurface {
     id: root
 
     property bool active: false
@@ -17,19 +17,17 @@ Rectangle {
     signal toggleRequested
 
     border.color: Theme.withAlpha(Theme.outline, active ? 0.22 : 0.1)
-    border.width: 1
     color: active ? Theme.withAlpha(Theme.primary, 0.28) : Theme.withAlpha(Theme.surfaceVariant,
                                                                            0.38)
     implicitHeight: 82
     opacity: available ? 1 : Theme.opacityMedium
-    radius: Theme.cornerRadius + 6
 
     RowLayout {
         anchors.fill: parent
         anchors.margins: Theme.spacingM
         spacing: Theme.spacingM
 
-        MaterialButton {
+        IconButton {
             Layout.alignment: Qt.AlignVCenter
             backgroundColor: root.active ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
             buttonSize: 46
@@ -83,7 +81,7 @@ Rectangle {
             StateLayer {
                 anchors.fill: parent
                 cornerRadius: Theme.cornerRadius
-                disabled: !root.available
+                enabled: root.available
                 stateColor: Theme.surfaceText
 
                 onClicked: root.openRequested()

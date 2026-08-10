@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls as Controls
 import Quickshell.Widgets
 
 import qs.Common
@@ -89,24 +88,8 @@ Item {
         }
     }
 
-    Controls.ToolTip {
-        id: tooltip
-
-        delay: 500
+    StyledToolTip {
         text: root.tooltipText()
         visible: mouseArea.containsMouse && text !== ""
-
-        background: Rectangle {
-            border.color: Theme.outlineMedium
-            border.width: 1
-            color: Theme.popupBackground()
-            radius: Theme.cornerRadius
-        }
-
-        contentItem: StyledText {
-            color: Theme.surfaceText
-            font.pixelSize: Theme.fontSizeSmall
-            text: tooltip.text
-        }
     }
 }

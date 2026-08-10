@@ -5,7 +5,7 @@ import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
 
-Rectangle {
+ControlCenterSurface {
     id: root
 
     property bool actionEnabled: available
@@ -21,12 +21,8 @@ Rectangle {
     signal actionRequested
     signal valueEdited(real value)
 
-    border.color: Theme.withAlpha(Theme.outline, 0.1)
-    border.width: 1
-    color: Theme.withAlpha(Theme.surfaceVariant, 0.38)
     implicitHeight: 92
     opacity: available ? 1 : Theme.opacityMedium
-    radius: Theme.cornerRadius + 6
 
     ColumnLayout {
         anchors.fill: parent
@@ -55,7 +51,7 @@ Rectangle {
                 visible: text !== ""
             }
 
-            MaterialButton {
+            IconButton {
                 Layout.preferredHeight: 26
                 Layout.preferredWidth: 26
                 buttonSize: 26

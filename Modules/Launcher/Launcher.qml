@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 
 import Quickshell
 import Quickshell.Hyprland
@@ -84,6 +83,7 @@ Modal {
                         iconSize: Theme.iconSize
                         iconColor: Theme.surfaceVariantText
                         iconFocusedColor: Theme.primary
+                        placeholderText: "Search applications"
 
                         Component.onCompleted: Qt.callLater(() => forceActiveFocus())
 

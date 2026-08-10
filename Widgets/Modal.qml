@@ -10,11 +10,11 @@ PanelWindow {
     id: root
 
     property alias content: contentLoader.sourceComponent
-    property alias contentLoader: contentLoader
 
     property real modalHeight: 300
     property real modalWidth: 400
-    property string positioning: "center"
+    property string positioning: "top"
+    property real topMargin: 5 * Theme.barHeight
     property color backgroundColor: Theme.popupBackground()
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 1
@@ -97,7 +97,7 @@ PanelWindow {
             onClicked: mouse => {
                 var localPos = mapToItem(content, mouse.x, mouse.y);
 
-                // Check if the clik is outside the content area
+                // Check if the click is outside the content area
                 if (localPos.x < 0 || localPos.x > content.width || localPos.y < 0 || localPos.y
                         > content.height) {
                     root.backgroundClicked();
@@ -111,10 +111,8 @@ PanelWindow {
 
         height: root.modalHeight
         width: root.modalWidth
-        // anchors.centerIn: root.positioning === "center" ? parent : undefined
-        anchors.top: parent.top
-        anchors.topMargin: 5 * Theme.barHeight
-        anchors.horizontalCenter: parent.horizontalCenter
+        x: Math.round((parent.width - width) / 2)
+        y: root.positioning === "center" ? Math.round((parent.height - height) / 2) : root.topMargin
 
         color: root.backgroundColor
         radius: root.cornerRadius

@@ -3,7 +3,7 @@ import QtQuick
 import qs.Common
 import qs.Widgets
 
-StyledRect {
+Rectangle {
     id: root
 
     property alias text: textInput.text
@@ -16,6 +16,7 @@ StyledRect {
     property color focusedBorderColor: Theme.primary
     property color normalBorderColor: Theme.outlineStrong
     property color placeholderColor: Theme.outlineButton
+    property string placeholderText: ""
     property int borderWidth: 1
     property int focusedBorderWidth: 2
     property real cornerRadius: Theme.cornerRadius
@@ -46,8 +47,16 @@ StyledRect {
         anchors.verticalCenter: parent.verticalCenter
         name: root.iconName
         size: root.iconSize
-        color: root.iconColor
+        color: textInput.activeFocus ? root.iconFocusedColor : root.iconColor
         visible: root.iconName !== ""
+    }
+
+    StyledText {
+        anchors.fill: textInput
+        color: root.placeholderColor
+        font.pixelSize: textInput.font.pixelSize
+        text: root.placeholderText
+        visible: textInput.text === "" && !textInput.preeditText
     }
 
     TextInput {
@@ -61,6 +70,6 @@ StyledRect {
         verticalAlignment: TextInput.AlignVCenter
         font.pixelSize: Theme.fontSizeMedium
         color: Theme.surfaceText
-        onTextChanged: root.textEdited()
+        onTextEdited: root.textEdited()
     }
 }

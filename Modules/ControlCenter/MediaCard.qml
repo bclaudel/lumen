@@ -5,15 +5,11 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+ControlCenterSurface {
     id: root
 
-    border.color: Theme.withAlpha(Theme.outline, 0.1)
-    border.width: 1
-    color: Theme.withAlpha(Theme.surfaceVariant, 0.38)
     implicitHeight: 174
     opacity: MediaService.available ? 1 : 0.78
-    radius: Theme.cornerRadius + 6
 
     ColumnLayout {
         anchors.fill: parent
@@ -80,7 +76,7 @@ Rectangle {
             Layout.alignment: Qt.AlignHCenter
             spacing: Theme.spacingS
 
-            MaterialButton {
+            IconButton {
                 buttonSize: 34
                 enabled: MediaService.canGoPrevious
                 iconColor: Theme.surfaceText
@@ -90,7 +86,7 @@ Rectangle {
                 onClicked: MediaService.previous()
             }
 
-            MaterialButton {
+            IconButton {
                 backgroundColor: Theme.withAlpha(Theme.surfaceText, 0.12)
                 buttonSize: 42
                 enabled: MediaService.canTogglePlaying
@@ -102,7 +98,7 @@ Rectangle {
                 onClicked: MediaService.togglePlaying()
             }
 
-            MaterialButton {
+            IconButton {
                 buttonSize: 34
                 enabled: MediaService.canGoNext
                 iconColor: Theme.surfaceText

@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls as Controls
 import QtQuick.Layouts
 
 import Quickshell
@@ -11,7 +10,7 @@ import Quickshell.Widgets
 import qs.Common
 import qs.Widgets
 
-Rectangle {
+ControlCenterSurface {
     id: root
 
     required property var targetScreen
@@ -45,58 +44,12 @@ Rectangle {
         uptimeFile.reload();
     }
 
-    border.color: Theme.withAlpha(Theme.outline, 0.1)
-    border.width: 1
-    color: Theme.withAlpha(Theme.surfaceVariant, 0.38)
     implicitHeight: 58
-    radius: Theme.cornerRadius + 6
 
-    component HeaderButton: Item {
-        id: buttonRoot
-
-        property string accessibleName: ""
-        property string iconName: ""
-        property string tooltipText: accessibleName
-
-        signal clicked
-
-        implicitHeight: 36
-        implicitWidth: 36
-
-        MaterialButton {
-            anchors.fill: parent
-            backgroundColor: "transparent"
-            buttonSize: 36
-            iconName: buttonRoot.iconName
-            iconSize: 20
-
-            onClicked: buttonRoot.clicked()
-        }
-
-        HoverHandler {
-            id: hoverHandler
-        }
-
-        Controls.ToolTip {
-            id: tooltip
-
-            delay: 500
-            text: buttonRoot.tooltipText
-            visible: hoverHandler.hovered
-
-            background: Rectangle {
-                border.color: Theme.outlineMedium
-                border.width: 1
-                color: Theme.popupBackground()
-                radius: Theme.cornerRadius
-            }
-
-            contentItem: StyledText {
-                color: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeSmall
-                text: tooltip.text
-            }
-        }
+    component HeaderButton: IconButton {
+        buttonSize: 36
+        iconSize: 20
+        tooltipText: accessibleName
     }
 
     RowLayout {
