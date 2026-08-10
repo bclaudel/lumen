@@ -6,6 +6,7 @@ Rectangle {
     id: root
 
     property bool active: false
+    property string iconName: "menu"
     property var screen
 
     signal clicked
@@ -22,7 +23,7 @@ Rectangle {
 
         anchors.centerIn: parent
         color: Theme.surfaceText
-        name: "menu"
+        name: root.iconName
         size: Theme.iconSize - 4
     }
 

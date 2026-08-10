@@ -178,9 +178,12 @@ Scope {
     PanelWindow {
         id: popupWindow
 
-        anchors.top: true
+        anchors {
+            right: true
+            top: true
+        }
         color: "transparent"
-        exclusionMode: ExclusionMode.Ignore
+        exclusionMode: ExclusionMode.Normal
         implicitHeight: 66
         implicitWidth: 280
         screen: root.targetScreen
@@ -188,7 +191,8 @@ Scope {
 
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.margins.top: Theme.barHeight + SettingsData.hyprlandGapsOut
+        WlrLayershell.margins.right: SettingsData.hyprlandGapsOut
+        WlrLayershell.margins.top: Theme.barHeight - Theme.spacingL + SettingsData.hyprlandGapsOut
         WlrLayershell.namespace: "quickshell:value-osd"
 
         mask: Region {}

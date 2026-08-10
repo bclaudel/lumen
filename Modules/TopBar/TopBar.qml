@@ -11,6 +11,9 @@ Variants {
 
     property bool controlCenterOpen: false
     property var controlCenterScreen: null
+    property bool osdActive: false
+    property string osdIcon: ""
+    property var osdScreen: null
     property real backgroundTransparency: SettingsData.topBarTransparency
 
     signal controlCenterRequested(var screen)
@@ -88,8 +91,11 @@ Variants {
                 BluetoothButton {}
 
                 ControlCenterButton {
-                    active: root.controlCenterOpen && root.controlCenterScreen
-                            === barWindow.modelData
+                    active: (root.controlCenterOpen && root.controlCenterScreen
+                             === barWindow.modelData) || (root.osdActive && root.osdScreen
+                                                          === barWindow.modelData)
+                    iconName: root.osdActive && root.osdScreen === barWindow.modelData
+                              ? root.osdIcon : "menu"
                     screen: barWindow.modelData
 
                     onClicked: {

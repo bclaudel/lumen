@@ -16,6 +16,9 @@ ShellRoot {
     TopBar {
         controlCenterOpen: controlCenter.isOpen
         controlCenterScreen: controlCenter.targetScreen
+        osdActive: onScreenDisplay.popupActive
+        osdIcon: onScreenDisplay.indicatorIcon
+        osdScreen: onScreenDisplay.targetScreen
 
         onControlCenterRequested: screen => {
             systemTrayPopup.close();
@@ -49,6 +52,8 @@ ShellRoot {
     }
 
     OnScreenDisplay {
+        id: onScreenDisplay
+
         suppressed: controlCenter.isOpen
     }
 
