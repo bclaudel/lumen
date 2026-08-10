@@ -13,10 +13,18 @@ Scope {
 
     property bool suppressed: false
     property bool audioInitialized: false
+    property bool brightnessInitialized: false
     property bool popupActive: false
     property bool popupShown: false
+    property string indicator: "volume"
     property var targetScreen: null
     property int audioGeneration: 0
+    property int brightnessGeneration: 0
+
+    readonly property string indicatorIcon: indicator === "brightness" ? "brightness_6" : volumeIcon
+    readonly property real indicatorValue: indicator === "brightness" ? BrightnessService.value :
+                                                                        AudioService.volume
+    readonly property string indicatorValueText: Math.round(indicatorValue * 100) + "%"
 
     readonly property string volumeIcon: {
         if (AudioService.muted)
@@ -47,14 +55,38 @@ Scope {
         });
     }
 
+    function initializeBrightness() {
+        brightnessInitialized = false;
+        const generation = ++brightnessGeneration;
+        if (!BrightnessService.available)
+            return;
+
+        Qt.callLater(() => {
+            if (generation === root.brightnessGeneration && BrightnessService.available)
+                root.brightnessInitialized = true;
+        });
+    }
+
+    function showBrightness() {
+        if (suppressed || !brightnessInitialized || !BrightnessService.available)
+            return;
+
+        showIndicator("brightness");
+    }
+
     function showVolume() {
         if (suppressed || !audioInitialized || !AudioService.available)
             return;
 
+        showIndicator("volume");
+    }
+
+    function showIndicator(requestedIndicator) {
         const resolvedScreen = ScreenService.resolveScreen(ScreenService.focusedScreen);
         if (!resolvedScreen)
             return;
 
+        indicator = requestedIndicator;
         closeAnimationTimer.stop();
         hideTimer.restart();
 
@@ -75,7 +107,10 @@ Scope {
         popupShown = true;
     }
 
-    Component.onCompleted: initializeAudio()
+    Component.onCompleted: {
+        initializeAudio();
+        initializeBrightness();
+    }
 
     onSuppressedChanged: {
         if (suppressed)
@@ -95,6 +130,18 @@ Scope {
 
         function onVolumeChanged() {
             root.showVolume();
+        }
+    }
+
+    Connections {
+        target: BrightnessService
+
+        function onAvailableChanged() {
+            root.initializeBrightness();
+        }
+
+        function onValueChanged() {
+            root.showBrightness();
         }
     }
 
@@ -142,16 +189,16 @@ Scope {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.margins.top: Theme.barHeight + SettingsData.hyprlandGapsOut
-        WlrLayershell.namespace: "quickshell:volume-osd"
+        WlrLayershell.namespace: "quickshell:value-osd"
 
         mask: Region {}
 
         ValueOsd {
             anchors.horizontalCenter: parent.horizontalCenter
-            iconName: root.volumeIcon
+            iconName: root.indicatorIcon
             opacity: root.popupShown ? 1 : 0
-            value: AudioService.volume
-            valueText: Math.round(AudioService.volume * 100) + "%"
+            value: root.indicatorValue
+            valueText: root.indicatorValueText
             y: root.popupShown ? 0 : -Theme.spacingS
 
             Behavior on opacity {
