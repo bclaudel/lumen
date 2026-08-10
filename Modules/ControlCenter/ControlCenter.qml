@@ -32,7 +32,6 @@ PanelWindow {
             isOpen = false;
         targetScreen = resolvedScreen;
         BrightnessService.setTargetScreen(resolvedScreen);
-        BrightnessService.refreshCurrentValue();
         NetworkService.refreshNetworkState();
 
         if (screenChanged) {
@@ -94,7 +93,7 @@ PanelWindow {
     Loader {
         id: controlCenterLoader
 
-        active: root.isOpen
+        active: true
         anchors.fill: parent
         asynchronous: true
         focus: root.isOpen
