@@ -7,6 +7,7 @@ Rectangle {
     id: root
 
     property alias text: textInput.text
+    property alias echoMode: textInput.echoMode
     property string iconName: ""
     property int iconSize: Theme.iconSize
     property color iconColor: Theme.surfaceVariantText
@@ -27,6 +28,7 @@ Rectangle {
     readonly property real rightPadding: Theme.spacingM
 
     signal textEdited
+    signal accepted
 
     function forceActiveFocus() {
         textInput.forceActiveFocus();
@@ -70,6 +72,7 @@ Rectangle {
         verticalAlignment: TextInput.AlignVCenter
         font.pixelSize: Theme.fontSizeMedium
         color: Theme.surfaceText
+        onAccepted: root.accepted()
         onTextEdited: root.textEdited()
     }
 }

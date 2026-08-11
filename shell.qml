@@ -20,6 +20,8 @@ ShellRoot {
             session.closeSessionScreen();
         if (activeSurface !== systemTrayPopup)
             systemTrayPopup.close();
+        if (activeSurface !== wifiPopup)
+            wifiPopup.close();
     }
 
     Background {}
@@ -30,6 +32,8 @@ ShellRoot {
         osdActive: onScreenDisplay.popupActive
         osdIcon: onScreenDisplay.indicatorIcon
         osdScreen: onScreenDisplay.targetScreen
+        wifiPopupOpen: wifiPopup.visible
+        wifiPopupScreen: wifiPopup.targetScreen
 
         onControlCenterRequested: screen => {
             systemTrayPopup.close();
@@ -42,6 +46,9 @@ ShellRoot {
         onTrayOverflowRequested: (anchorItem, screen) => {
             controlCenter.closeControlCenter();
             systemTrayPopup.showOverflow(anchorItem, screen);
+        }
+        onWifiPopupRequested: (anchorItem, screen) => {
+            wifiPopup.toggle(anchorItem, screen);
         }
     }
 
@@ -92,6 +99,15 @@ ShellRoot {
         onVisibleChanged: {
             if (systemTrayPopup.visible)
                 root.activateExclusiveSurface(systemTrayPopup);
+        }
+    }
+
+    WifiPopup {
+        id: wifiPopup
+
+        onVisibleChanged: {
+            if (wifiPopup.visible)
+                root.activateExclusiveSurface(wifiPopup);
         }
     }
 }

@@ -14,11 +14,14 @@ Variants {
     property bool osdActive: false
     property string osdIcon: ""
     property var osdScreen: null
+    property bool wifiPopupOpen: false
+    property var wifiPopupScreen: null
     property real backgroundTransparency: SettingsData.topBarTransparency
 
     signal controlCenterRequested(var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
+    signal wifiPopupRequested(var anchorItem, var screen)
 
     function formatDate(dateTime) {
         return Qt.formatDateTime(dateTime, "ddd MMM d  h:mmAP");
@@ -86,7 +89,13 @@ Variants {
                     }
                 }
 
-                WifiButton {}
+                WifiButton {
+                    id: wifiButton
+
+                    active: root.wifiPopupOpen && root.wifiPopupScreen === barWindow.modelData
+
+                    onClicked: root.wifiPopupRequested(wifiButton, barWindow.modelData)
+                }
 
                 BluetoothButton {}
 
