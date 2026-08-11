@@ -200,7 +200,7 @@ Scope {
         ValueOsd {
             anchors.horizontalCenter: parent.horizontalCenter
             iconName: root.indicatorIcon
-            opacity: root.popupShown ? 1 : 0
+            opacity: root.popupShown ? Theme.opacityFull : 0
             value: root.indicatorValue
             valueText: root.indicatorValueText
             y: root.popupShown ? 0 : -Theme.spacingS

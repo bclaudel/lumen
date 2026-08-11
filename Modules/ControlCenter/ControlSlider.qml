@@ -22,7 +22,7 @@ ControlCenterSurface {
     signal valueEdited(real value)
 
     implicitHeight: 92
-    opacity: available ? 1 : Theme.opacityMedium
+    opacity: available ? Theme.opacityFull : Theme.opacityUnavailable
 
     ColumnLayout {
         anchors.fill: parent
@@ -109,7 +109,7 @@ ControlCenterSurface {
                 implicitHeight: 26
                 implicitWidth: 3
                 color: Theme.primaryText
-                opacity: slider.pressed ? 0.9 : 0
+                opacity: slider.pressed ? Theme.opacityHigh : 0
                 radius: width / 2
             }
 

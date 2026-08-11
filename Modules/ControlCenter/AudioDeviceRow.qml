@@ -98,7 +98,7 @@ Item {
             Layout.preferredHeight: implicitHeight
             enabled: root.expanded
             maximumHeight: root.maximumSelectorHeight
-            opacity: root.expanded ? 1 : 0
+            opacity: root.expanded ? Theme.opacityFull : 0
             selectingInput: root.selectingInput
             visible: root.selectorVisible
 

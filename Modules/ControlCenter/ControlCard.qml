@@ -20,7 +20,7 @@ ControlCenterSurface {
     color: active ? Theme.withAlpha(Theme.primary, 0.28) : Theme.withAlpha(Theme.surfaceVariant,
                                                                            0.38)
     implicitHeight: 82
-    opacity: available ? 1 : Theme.opacityMedium
+    opacity: available ? Theme.opacityFull : Theme.opacityUnavailable
 
     RowLayout {
         anchors.fill: parent

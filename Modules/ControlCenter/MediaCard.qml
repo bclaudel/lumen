@@ -9,7 +9,7 @@ ControlCenterSurface {
     id: root
 
     implicitHeight: 174
-    opacity: MediaService.available ? 1 : 0.78
+    opacity: MediaService.available ? Theme.opacityFull : Theme.opacityInactive
 
     ColumnLayout {
         anchors.fill: parent
@@ -81,7 +81,7 @@ ControlCenterSurface {
                 enabled: MediaService.canGoPrevious
                 iconColor: Theme.surfaceText
                 iconName: "skip_previous"
-                opacity: enabled ? 1 : Theme.opacityDisabled
+                opacity: enabled ? Theme.opacityFull : Theme.opacityDisabled
 
                 onClicked: MediaService.previous()
             }
@@ -93,7 +93,7 @@ ControlCenterSurface {
                 iconColor: Theme.surfaceText
                 iconName: MediaService.playing ? "pause" : "play_arrow"
                 iconSize: Theme.iconSize
-                opacity: enabled ? 1 : Theme.opacityDisabled
+                opacity: enabled ? Theme.opacityFull : Theme.opacityDisabled
 
                 onClicked: MediaService.togglePlaying()
             }
@@ -103,7 +103,7 @@ ControlCenterSurface {
                 enabled: MediaService.canGoNext
                 iconColor: Theme.surfaceText
                 iconName: "skip_next"
-                opacity: enabled ? 1 : Theme.opacityDisabled
+                opacity: enabled ? Theme.opacityFull : Theme.opacityDisabled
 
                 onClicked: MediaService.next()
             }

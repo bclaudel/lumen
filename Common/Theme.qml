@@ -30,11 +30,12 @@ Singleton {
     property color info: "#2196F3"
     property color inputBackground: withAlpha(surfaceContainer, 0.9)
     property color itemBackground: withAlpha(surfaceVariant, 0.03)
-    property color modalScrimBackground: withAlpha(surfaceContainer, opacityMedium)
+    property color modalScrimBackground: withAlpha(surfaceContainer, opacityInactive)
     property real opacityDisabled: 0.38
     property real opacityFull: 1
     property real opacityHigh: 0.87
-    property real opacityMedium: 0.6
+    property real opacityInactive: 0.75
+    property real opacityUnavailable: 0.6
     property color outline: getCurrentTheme().outline
     property color outlineButton: Qt.rgba(outline.r, outline.g, outline.b, 0.5)
     property color outlineHeavy: Qt.rgba(outline.r, outline.g, outline.b, 0.3)

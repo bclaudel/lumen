@@ -19,7 +19,7 @@ Controls.AbstractButton {
     hoverEnabled: enabled
     implicitHeight: 82
     leftPadding: Theme.spacingM
-    opacity: available ? 1 : Theme.opacityMedium
+    opacity: available ? Theme.opacityFull : Theme.opacityUnavailable
     rightPadding: Theme.spacingM
 
     background: ControlCenterSurface {
