@@ -30,11 +30,11 @@ Controls.AbstractButton {
         color: root.active ? Theme.withAlpha(Theme.primary, 0.2) : Theme.withAlpha(Theme.surfaceVariant,
                                                                                    0.38)
 
-        Rectangle {
-            anchors.fill: parent
-            color: Theme.withAlpha(Theme.surfaceText, root.down ? 0.12 : root.hovered
-                                                                  || root.visualFocus ? 0.08 : 0)
-            radius: parent.radius
+        StateOverlay {
+            cornerRadius: Theme.cornerRadius + 6
+            hovered: root.hovered
+            pressed: root.down
+            focused: root.visualFocus
         }
     }
 

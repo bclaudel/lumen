@@ -24,11 +24,14 @@ Controls.AbstractButton {
     background: Rectangle {
         border.color: root.connected ? Theme.primary : "transparent"
         border.width: root.connected ? 1 : 0
-        color: root.connected ? Theme.primarySelected : root.down ? Theme.surfacePressed : root.hovered
-                                                                    || root.visualFocus
-                                                                    ? Theme.surfaceHover :
-                                                                      "transparent"
+        color: root.connected ? Theme.primarySelected : "transparent"
         radius: Theme.cornerRadius
+
+        StateOverlay {
+            hovered: root.hovered
+            pressed: root.down
+            focused: root.visualFocus
+        }
     }
 
     contentItem: RowLayout {

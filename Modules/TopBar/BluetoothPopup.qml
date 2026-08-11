@@ -85,10 +85,14 @@ TopBarPopup {
                 hoverEnabled: true
 
                 background: Rectangle {
-                    color: settingsButton.down ? Theme.surfacePressed : settingsButton.hovered
-                                                 || settingsButton.visualFocus ? Theme.surfaceHover :
-                                                                                 "transparent"
+                    color: "transparent"
                     radius: Theme.cornerRadius
+
+                    StateOverlay {
+                        hovered: settingsButton.hovered
+                        pressed: settingsButton.down
+                        focused: settingsButton.visualFocus
+                    }
                 }
 
                 contentItem: RowLayout {

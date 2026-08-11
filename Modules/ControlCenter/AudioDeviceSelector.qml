@@ -90,13 +90,14 @@ ControlCenterSurface {
                                                                                      "transparent"
                     border.width: deviceDelegate.modelData === root.selectedDevice ? 1 : 0
                     color: deviceDelegate.modelData === root.selectedDevice ? Theme.primarySelected :
-                                                                              deviceDelegate.down
-                                                                              ? Theme.surfacePressed :
-                                                                                deviceDelegate.hovered
-                                                                                || deviceDelegate.visualFocus
-                                                                                ? Theme.surfaceHover :
-                                                                                  "transparent"
+                                                                              "transparent"
                     radius: Theme.cornerRadius
+
+                    StateOverlay {
+                        hovered: deviceDelegate.hovered
+                        pressed: deviceDelegate.down
+                        focused: deviceDelegate.visualFocus
+                    }
                 }
 
                 contentItem: RowLayout {

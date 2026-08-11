@@ -154,11 +154,14 @@ TopBarPopup {
                 hoverEnabled: enabled
 
                 background: Rectangle {
-                    color: otherNetworksButton.down ? Theme.surfacePressed :
-                                                      otherNetworksButton.hovered
-                                                      || otherNetworksButton.visualFocus
-                                                      ? Theme.surfaceHover : "transparent"
+                    color: "transparent"
                     radius: Theme.cornerRadius
+
+                    StateOverlay {
+                        hovered: otherNetworksButton.hovered
+                        pressed: otherNetworksButton.down
+                        focused: otherNetworksButton.visualFocus
+                    }
                 }
 
                 contentItem: RowLayout {
@@ -293,10 +296,14 @@ TopBarPopup {
                 hoverEnabled: true
 
                 background: Rectangle {
-                    color: settingsButton.down ? Theme.surfacePressed : settingsButton.hovered
-                                                 || settingsButton.visualFocus ? Theme.surfaceHover :
-                                                                                 "transparent"
+                    color: "transparent"
                     radius: Theme.cornerRadius
+
+                    StateOverlay {
+                        hovered: settingsButton.hovered
+                        pressed: settingsButton.down
+                        focused: settingsButton.visualFocus
+                    }
                 }
 
                 contentItem: RowLayout {
