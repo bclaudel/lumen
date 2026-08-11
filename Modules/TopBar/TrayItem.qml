@@ -20,8 +20,8 @@ Item {
         return description ? `${title}\n${description}` : title;
     }
 
-    implicitHeight: 24
-    implicitWidth: 24
+    implicitHeight: Theme.topBarWidgetHeight
+    implicitWidth: Theme.topBarIconSize
 
     Rectangle {
         anchors.fill: parent
@@ -34,10 +34,10 @@ Item {
         id: trayIcon
 
         anchors.centerIn: parent
-        height: 18
+        height: Theme.topBarIconSize
         source: root.trayItem?.icon ?? ""
         visible: status === Image.Ready
-        width: 18
+        width: Theme.topBarIconSize
     }
 
     StyledText {

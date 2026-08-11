@@ -13,5 +13,6 @@ IconButton {
     buttonHeight: Theme.topBarWidgetHeight
     buttonWidth: iconSize + 2 * Theme.spacingM
     circular: false
+    iconSize: Theme.topBarIconSize
     stateLayerEnabled: false
 }

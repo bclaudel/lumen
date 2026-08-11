@@ -28,7 +28,7 @@ Rectangle {
     height: Theme.topBarWidgetHeight
     radius: Theme.cornerRadius
     visible: visibleTrayItems.length > 0
-    width: visible ? trayRow.width + 2 * Theme.spacingXS : 0
+    width: visible ? trayRow.width + 2 * Theme.spacingM : 0
 
     Row {
         id: trayRow
@@ -53,14 +53,14 @@ Rectangle {
         Item {
             id: overflowButton
 
-            height: 24
+            height: Theme.topBarWidgetHeight
             visible: root.overflowItems.length > 0
-            width: visible ? 24 : 0
+            width: visible ? Theme.topBarIconSize : 0
 
             MaterialIcon {
                 anchors.centerIn: parent
                 name: "expand_more"
-                size: Theme.iconSize - 4
+                size: Theme.topBarIconSize
             }
 
             StateLayer {
