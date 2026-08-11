@@ -11,6 +11,17 @@ import qs.Modules.Launcher
 ShellRoot {
     id: root
 
+    function activateExclusiveSurface(activeSurface) {
+        if (activeSurface !== controlCenter)
+            controlCenter.closeControlCenter();
+        if (activeSurface !== launcher)
+            launcher.hide();
+        if (activeSurface !== session)
+            session.closeSessionScreen();
+        if (activeSurface !== systemTrayPopup)
+            systemTrayPopup.close();
+    }
+
     Background {}
 
     TopBar {
@@ -39,7 +50,7 @@ ShellRoot {
 
         onIsOpenChanged: {
             if (controlCenter.isOpen)
-                systemTrayPopup.close();
+                root.activateExclusiveSurface(controlCenter);
         }
         onLauncherRequested: screen => {
             controlCenter.closeControlCenter();
@@ -59,13 +70,28 @@ ShellRoot {
 
     Session {
         id: session
+
+        onIsOpenChanged: {
+            if (session.isOpen)
+                root.activateExclusiveSurface(session);
+        }
     }
 
     Launcher {
         id: launcher
+
+        onVisibleChanged: {
+            if (launcher.visible)
+                root.activateExclusiveSurface(launcher);
+        }
     }
 
     SystemTrayPopup {
         id: systemTrayPopup
+
+        onVisibleChanged: {
+            if (systemTrayPopup.visible)
+                root.activateExclusiveSurface(systemTrayPopup);
+        }
     }
 }
