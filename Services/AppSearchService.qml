@@ -4,6 +4,8 @@ import QtQuick
 
 import Quickshell
 
+import qs.Common
+
 import "../Common/fuzzysort.js" as Fuzzy
 
 Singleton {
@@ -18,9 +20,25 @@ Singleton {
         }));
 }
 
+function compareFrecency(a, b) {
+    var frecencyDifference = AppUsageHistoryData.computeFrecency(b.id)
+            - AppUsageHistoryData.computeFrecency(a.id);
+    if (frecencyDifference !== 0)
+        return frecencyDifference;
+
+    return (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase());
+}
+
+function frecencyBonus(app) {
+    var frecency = Math.max(0, AppUsageHistoryData.computeFrecency(app.id));
+
+    // Match tiers remain dominant, while usage meaningfully orders equally relevant apps.
+    return 10 * frecency / (frecency + 1);
+}
+
 function searchApplications(query) {
     if (query === "") {
-        return applications;
+        return applications.slice().sort(compareFrecency);
     }
 
     if (preppedApps.length === 0) {
@@ -41,23 +59,25 @@ function searchApplications(query) {
                                        var nameLower = appName.toLowerCase();
 
                                        if (nameLower === queryLower) {
-                                           finalScore = nameScore * 100;
+                                           finalScore = 500;
                                        } else if (nameLower.startsWith(queryLower)) {
-                                           finalScore = nameScore * 50;
+                                           finalScore = 400;
                                        } else if (nameLower.includes(" " + queryLower)
                                                   || nameLower.includes(queryLower + " ")
                                                   || nameLower.endsWith(" " + queryLower)) {
-                                           finalScore = nameScore * 25;
+                                           finalScore = 300;
                                        } else if (nameLower.includes(queryLower)) {
-                                           finalScore = nameScore * 10;
+                                           finalScore = 200;
                                        } else {
-                                           finalScore = nameScore * 2 + commentScore * 0.1;
+                                           finalScore = 100;
                                        }
+
+                                       finalScore += nameScore * 10 + commentScore;
                                    } else {
-                                       finalScore = commentScore * 0.1;
+                                       finalScore = commentScore * 10;
                                    }
 
-                                   return finalScore;
+                                   return finalScore + root.frecencyBonus(r.obj.entry);
                                },
                                "limit": 50
                            });

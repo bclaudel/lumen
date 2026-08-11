@@ -17,23 +17,6 @@ Item {
         filteredModel.clear();
         var apps = Services.AppSearchService.searchApplications(searchQuery);
 
-        if (searchQuery === "") {
-            apps.sort((a, b) => {
-                var aFrecency = AppUsageHistoryData.computeFrecency(a.id);
-                var bFrecency = AppUsageHistoryData.computeFrecency(b.id);
-
-                // First sort by frecency
-                if (aFrecency !== bFrecency) {
-                    return bFrecency - aFrecency;
-                }
-
-                // Then sort alphabetically
-                var aName = (a.name || "").toLowerCase();
-                var bName = (b.name || "").toLowerCase();
-                return aName.localeCompare(bName);
-            });
-        }
-
         selectedIndex = apps.length > 0 ? Math.min(selectedIndex, apps.length - 1) : 0;
 
         apps.forEach(app => {
