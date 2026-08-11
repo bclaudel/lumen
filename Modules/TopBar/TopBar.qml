@@ -9,6 +9,8 @@ import qs.Widgets
 Variants {
     id: root
 
+    property bool bluetoothPopupOpen: false
+    property var bluetoothPopupScreen: null
     property bool controlCenterOpen: false
     property var controlCenterScreen: null
     property bool osdActive: false
@@ -18,6 +20,7 @@ Variants {
     property var wifiPopupScreen: null
     property real backgroundTransparency: SettingsData.topBarTransparency
 
+    signal bluetoothPopupRequested(var anchorItem, var screen)
     signal controlCenterRequested(var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
@@ -97,7 +100,14 @@ Variants {
                     onClicked: root.wifiPopupRequested(wifiButton, barWindow.modelData)
                 }
 
-                BluetoothButton {}
+                BluetoothButton {
+                    id: bluetoothButton
+
+                    active: root.bluetoothPopupOpen && root.bluetoothPopupScreen
+                            === barWindow.modelData
+
+                    onClicked: root.bluetoothPopupRequested(bluetoothButton, barWindow.modelData)
+                }
 
                 ControlCenterButton {
                     active: (root.controlCenterOpen && root.controlCenterScreen

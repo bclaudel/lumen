@@ -12,6 +12,8 @@ ShellRoot {
     id: root
 
     function activateExclusiveSurface(activeSurface) {
+        if (activeSurface !== bluetoothPopup)
+            bluetoothPopup.close();
         if (activeSurface !== controlCenter)
             controlCenter.closeControlCenter();
         if (activeSurface !== launcher)
@@ -27,6 +29,8 @@ ShellRoot {
     Background {}
 
     TopBar {
+        bluetoothPopupOpen: bluetoothPopup.visible
+        bluetoothPopupScreen: bluetoothPopup.targetScreen
         controlCenterOpen: controlCenter.isOpen
         controlCenterScreen: controlCenter.targetScreen
         osdActive: onScreenDisplay.popupActive
@@ -35,6 +39,9 @@ ShellRoot {
         wifiPopupOpen: wifiPopup.visible
         wifiPopupScreen: wifiPopup.targetScreen
 
+        onBluetoothPopupRequested: (anchorItem, screen) => {
+            bluetoothPopup.toggle(anchorItem, screen);
+        }
         onControlCenterRequested: screen => {
             systemTrayPopup.close();
             controlCenter.toggleControlCenter(screen);
@@ -49,6 +56,15 @@ ShellRoot {
         }
         onWifiPopupRequested: (anchorItem, screen) => {
             wifiPopup.toggle(anchorItem, screen);
+        }
+    }
+
+    BluetoothPopup {
+        id: bluetoothPopup
+
+        onVisibleChanged: {
+            if (bluetoothPopup.visible)
+                root.activateExclusiveSurface(bluetoothPopup);
         }
     }
 
