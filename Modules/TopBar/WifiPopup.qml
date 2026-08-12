@@ -82,6 +82,7 @@ TopBarPopup {
                 StyledText {
                     Layout.fillWidth: true
                     color: Theme.surfaceText
+                    font.family: SettingsData.displayFontFamily
                     font.pixelSize: Theme.fontSizeLarge
                     font.weight: Font.DemiBold
                     text: "Wi-Fi"

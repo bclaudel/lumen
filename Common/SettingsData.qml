@@ -15,7 +15,8 @@ Singleton {
     property int trayMaxVisibleItems: 5
     property var trayOverflowItemIds: ["Fcitx"]
     property string wallpaperPath: "/home/benoit/Pictures/arch_2560x1440.png"
-    property string fontFamily: "Roboto"
+    property string displayFontFamily: "Adwaita Sans"
+    property string fontFamily: "Adwaita Sans"
 
     function isTrayOverflowOnly(item) {
         return item && root.trayOverflowItemIds.includes(item.id);

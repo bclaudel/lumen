@@ -129,6 +129,7 @@ Scope {
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
                         color: Theme.surfaceText
+                        font.family: SettingsData.displayFontFamily
                         font.pixelSize: Theme.fontSizeXXLarge
                         font.weight: Font.DemiBold
                         horizontalAlignment: Text.AlignHCenter
