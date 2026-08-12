@@ -12,6 +12,13 @@ Singleton {
 
     property bool available: false
     property string backend: ""
+    readonly property string brightnessIcon: {
+        if (value < 0.34)
+        return "brightness_low";
+        if (value < 0.67)
+        return "brightness_medium";
+        return "brightness_high";
+    }
     property string ddcBus: ""
     property bool detecting: false
     property bool monitoring: false

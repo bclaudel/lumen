@@ -18,6 +18,15 @@ Singleton {
     readonly property bool sourceAvailable: source !== null && source.ready && source.audio !== null
     readonly property bool sourceMuted: sourceAvailable ? source.audio.muted : false
     readonly property real volume: available ? Math.min(1, Math.max(0, sink.audio.volume)) : 0
+    readonly property string volumeIcon: {
+        if (muted)
+        return "volume_off";
+        if (volume < 0.01)
+        return "volume_mute";
+        if (volume < 0.5)
+        return "volume_down";
+        return "volume_up";
+    }
 
     function deviceDisplayName(node) {
         if (!node)

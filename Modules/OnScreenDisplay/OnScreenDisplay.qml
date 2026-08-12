@@ -21,20 +21,12 @@ Scope {
     property int audioGeneration: 0
     property int brightnessGeneration: 0
 
-    readonly property string indicatorIcon: indicator === "brightness" ? "brightness_6" : volumeIcon
+    readonly property string indicatorIcon: indicator === "brightness"
+                                            ? BrightnessService.brightnessIcon :
+                                              AudioService.volumeIcon
     readonly property real indicatorValue: indicator === "brightness" ? BrightnessService.value :
                                                                         AudioService.volume
     readonly property string indicatorValueText: Math.round(indicatorValue * 100) + "%"
-
-    readonly property string volumeIcon: {
-        if (AudioService.muted)
-        return "volume_off";
-        if (AudioService.volume < 0.01)
-        return "volume_mute";
-        if (AudioService.volume < 0.5)
-        return "volume_down";
-        return "volume_up";
-    }
 
     function dismiss() {
         hideTimer.stop();

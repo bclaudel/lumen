@@ -213,8 +213,11 @@ PanelWindow {
                     ControlSlider {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 92
+                        actionEnabled: false
+                        actionIconName: BrightnessService.brightnessIcon
+                        actionVisible: true
                         available: BrightnessService.available
-                        iconName: "brightness_6"
+                        iconName: BrightnessService.brightnessIcon
                         statusText: Math.round(BrightnessService.value * 100) + "%"
                         title: "Display"
                         unavailableText: BrightnessService.detecting ? "Detecting…" : "Unavailable"
@@ -226,10 +229,10 @@ PanelWindow {
                     ControlSlider {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 92
-                        actionIconName: AudioService.muted ? "volume_off" : "volume_up"
+                        actionIconName: AudioService.volumeIcon
                         actionVisible: true
                         available: AudioService.available
-                        iconName: AudioService.muted ? "volume_off" : "volume_up"
+                        iconName: AudioService.volumeIcon
                         statusText: AudioService.muted ? "Muted" : Math.round(AudioService.volume
                                                                               * 100) + "%"
                         title: "Sound"
