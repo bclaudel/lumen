@@ -34,7 +34,7 @@ Rectangle {
         id: trayRow
 
         anchors.centerIn: parent
-        spacing: Theme.spacingXS
+        spacing: Theme.topBarTrayItemSpacing
 
         Repeater {
             model: root.inlineItems

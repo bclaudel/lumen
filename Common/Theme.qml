@@ -10,6 +10,7 @@ Singleton {
     property int currentThemeIndex: 0
     property color archBlue: "#1793D1"
     property real barHeight: 40
+    property real topBarTrayItemSpacing: 8
     property real topBarWidgetHeight: 26
     property color buttonActiveBackground: secondary
     property color buttonBackground: surfaceVariant
