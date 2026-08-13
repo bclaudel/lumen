@@ -42,6 +42,8 @@ TopBarPopup {
                 }
             }
 
+            HorizontalSeparator {}
+
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.bottomMargin: Theme.spacingL
@@ -76,6 +78,8 @@ TopBarPopup {
                 verticalAlignment: Text.AlignVCenter
                 visible: BluetoothService.enabled && BluetoothService.knownDevices.length === 0
             }
+
+            HorizontalSeparator {}
 
             Controls.AbstractButton {
                 id: settingsButton

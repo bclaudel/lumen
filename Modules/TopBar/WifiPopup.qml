@@ -96,6 +96,8 @@ TopBarPopup {
                 }
             }
 
+            HorizontalSeparator {}
+
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.bottomMargin: Theme.spacingL
@@ -144,6 +146,10 @@ TopBarPopup {
                 text: NetworkService.scanning ? "Looking for networks…" : "No known networks nearby"
                 verticalAlignment: Text.AlignVCenter
                 visible: NetworkService.wifiEnabled && NetworkService.knownNetworks.length === 0
+            }
+
+            HorizontalSeparator {
+                visible: NetworkService.wifiEnabled
             }
 
             Controls.AbstractButton {
@@ -287,6 +293,8 @@ TopBarPopup {
                 verticalAlignment: Text.AlignVCenter
                 visible: root.otherNetworksExpanded && NetworkService.otherNetworks.length === 0
             }
+
+            HorizontalSeparator {}
 
             Controls.AbstractButton {
                 id: settingsButton
