@@ -115,10 +115,10 @@ ControlCenterSurface {
         }
 
         HeaderButton {
-            accessibleName: "Reload Hyprland"
+            accessibleName: "Reload Lumen"
             iconName: "restart_alt"
 
-            onClicked: Quickshell.execDetached(["hyprctl", "reload"])
+            onClicked: Quickshell.reload(true)
         }
 
         HeaderButton {
