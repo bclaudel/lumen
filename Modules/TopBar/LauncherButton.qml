@@ -17,7 +17,6 @@ TopBarButton {
             id: archIcon
 
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: 2
             height: root.iconSize
             smooth: true
             source: Qt.resolvedUrl("../../Assets/archlinux.svg")
