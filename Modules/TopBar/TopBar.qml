@@ -13,6 +13,8 @@ Variants {
     property var bluetoothPopupScreen: null
     property bool controlCenterOpen: false
     property var controlCenterScreen: null
+    property bool launcherOpen: false
+    property var launcherScreen: null
     property bool osdActive: false
     property string osdIcon: ""
     property var osdScreen: null
@@ -22,6 +24,7 @@ Variants {
 
     signal bluetoothPopupRequested(var anchorItem, var screen)
     signal controlCenterRequested(var screen)
+    signal launcherRequested(var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
     signal wifiPopupRequested(var anchorItem, var screen)
@@ -67,6 +70,12 @@ Variants {
                 anchors.verticalCenter: parent.verticalCenter
                 height: parent.height
                 spacing: Theme.spacingXS
+
+                LauncherButton {
+                    active: root.launcherOpen && root.launcherScreen === barWindow.modelData
+
+                    onClicked: root.launcherRequested(barWindow.modelData)
+                }
 
                 Workspaces {
                     screen: barWindow.modelData

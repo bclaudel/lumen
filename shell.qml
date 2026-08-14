@@ -33,6 +33,8 @@ ShellRoot {
         bluetoothPopupScreen: bluetoothPopup.targetScreen
         controlCenterOpen: controlCenter.isOpen
         controlCenterScreen: controlCenter.targetScreen
+        launcherOpen: launcher.visible
+        launcherScreen: launcher.targetScreen
         osdActive: onScreenDisplay.popupActive
         osdIcon: onScreenDisplay.indicatorIcon
         osdScreen: onScreenDisplay.targetScreen
@@ -46,6 +48,7 @@ ShellRoot {
             systemTrayPopup.close();
             controlCenter.toggleControlCenter(screen);
         }
+        onLauncherRequested: screen => launcher.toggle(screen)
         onTrayMenuRequested: (trayItem, anchorItem, screen) => {
             controlCenter.closeControlCenter();
             systemTrayPopup.showMenu(trayItem, anchorItem, screen);
