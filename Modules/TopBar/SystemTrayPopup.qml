@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Services.SystemTray as TrayService
 import Quickshell.Widgets
 
 import qs.Common
@@ -24,13 +23,7 @@ PanelWindow {
     readonly property var activeMenu: submenuStack.length > 0 ? submenuStack[submenuStack.length
                                                                              - 1] : currentTrayItem
                                                                 ?.menu ?? null
-    readonly property var trayItems: TrayService.SystemTray.items.values
-    readonly property var inlineItems: trayItems.filter(item => !SettingsData.isTrayOverflowOnly(
-                                                                    item)).slice(0,
-                                                                                 SettingsData.trayMaxVisibleItems)
-    readonly property var overflowItems: trayItems.filter(item => SettingsData.isTrayOverflowOnly(
-                                                                      item) || inlineItems.indexOf(
-                                                                      item) === -1)
+    readonly property var overflowItems: SystemTrayService.overflowItems
     readonly property real overflowHeight: 30
     readonly property real overflowWidth: overflowItems.length * (Theme.iconSize + Theme.spacingXS)
                                           - Theme.spacingXS + 6
@@ -426,18 +419,20 @@ PanelWindow {
     }
 
     Connections {
-        function onValuesChanged() {
+        function onOverflowItemsChanged() {
             if (!root.visible)
                 return;
 
-            if (root.mode === "overflow" && root.overflowItems.length === 0) {
+            if (root.mode === "overflow" && root.overflowItems.length === 0)
                 root.close();
-            } else if (root.mode === "menu" && !TrayService.SystemTray.items.values.some(item => item
-                                                                                                 === root.currentTrayItem)) {
-                root.close();
-            }
         }
 
-        target: TrayService.SystemTray.items
+        function onVisibleItemsChanged() {
+            if (root.visible && root.mode === "menu" && SystemTrayService.visibleItems.indexOf(
+                        root.currentTrayItem) === -1)
+                root.close();
+        }
+
+        target: SystemTrayService
     }
 }

@@ -1,24 +1,15 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell.Services.SystemTray as TrayService
 
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Rectangle {
     id: root
 
     property var screen
-    readonly property var trayItems: TrayService.SystemTray.items.values
-    readonly property var visibleTrayItems: trayItems.filter(item => item.status
-                                                                     !== TrayService.Status.Passive)
-    readonly property var inlineItems: visibleTrayItems.filter(item =>
-    !SettingsData.isTrayOverflowOnly(item)).slice(0, SettingsData.trayMaxVisibleItems)
-    readonly property var overflowItems: visibleTrayItems.filter(item
-                                                                 => SettingsData.isTrayOverflowOnly(
-                                                                        item) || inlineItems.indexOf(
-                                                                        item) === -1)
 
     signal menuRequested(var trayItem, var anchorItem, var screen)
     signal overflowRequested(var anchorItem, var screen)
@@ -27,7 +18,7 @@ Rectangle {
     color: Theme.widgetBackground
     height: Theme.topBarWidgetHeight
     radius: Theme.cornerRadius
-    visible: visibleTrayItems.length > 0
+    visible: SystemTrayService.visibleItems.length > 0
     width: visible ? trayRow.width + 2 * Theme.spacingM : 0
 
     Row {
@@ -37,7 +28,7 @@ Rectangle {
         spacing: Theme.topBarTrayItemSpacing
 
         Repeater {
-            model: root.inlineItems
+            model: SystemTrayService.inlineItems
 
             TrayItem {
                 required property var modelData
@@ -54,7 +45,7 @@ Rectangle {
             id: overflowButton
 
             height: Theme.topBarWidgetHeight
-            visible: root.overflowItems.length > 0
+            visible: SystemTrayService.overflowItems.length > 0
             width: visible ? Theme.topBarIconSize : 0
 
             MaterialIcon {

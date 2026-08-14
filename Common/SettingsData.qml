@@ -18,10 +18,6 @@ Singleton {
     property string displayFontFamily: "Adwaita Sans"
     property string fontFamily: "Adwaita Sans"
 
-    function isTrayOverflowOnly(item) {
-        return item && root.trayOverflowItemIds.includes(item.id);
-    }
-
     function setNetworkPreference(preference) {
         root.networkPreference = preference;
     }
