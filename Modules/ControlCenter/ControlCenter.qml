@@ -184,9 +184,14 @@ PanelWindow {
                                 }
                                 title: "Wi-Fi"
 
-                                onOpenRequested: NetworkService.openWifiSettings()
-                                onToggleRequested: NetworkService.setWifiEnabled(
-                                                       !NetworkService.wifiEnabled)
+                                onOpenRequested: {
+                                    NetworkService.openWifiSettings();
+                                    root.closeControlCenter();
+                                }
+                                onToggleRequested: {
+                                    NetworkService.setWifiEnabled(!NetworkService.wifiEnabled);
+                                    root.closeControlCenter();
+                                }
                             }
 
                             ControlCard {
@@ -198,9 +203,14 @@ PanelWindow {
                                 subtitle: BluetoothService.statusText
                                 title: "Bluetooth"
 
-                                onOpenRequested: BluetoothService.openSettings()
-                                onToggleRequested: BluetoothService.setEnabled(
-                                                       !BluetoothService.enabled)
+                                onOpenRequested: {
+                                    BluetoothService.openSettings();
+                                    root.closeControlCenter();
+                                }
+                                onToggleRequested: {
+                                    BluetoothService.setEnabled(!BluetoothService.enabled);
+                                    root.closeControlCenter();
+                                }
                             }
                         }
 
