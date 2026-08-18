@@ -25,6 +25,8 @@ Modal {
 
     modalWidth: 550
     modalHeight: 600
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, 0.9)
+    borderColor: Theme.withAlpha(Theme.outline, 0.16)
     content: spotlightContent
     onBackgroundClicked: {
         hide();
@@ -57,6 +59,15 @@ Modal {
 
             AppLauncher {
                 id: appLauncher
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 1
+                border.color: Theme.withAlpha(Theme.surfaceText, 0.05)
+                border.width: 1
+                color: "transparent"
+                radius: root.cornerRadius - 1
             }
 
             Column {
@@ -153,13 +164,15 @@ Modal {
                             width: ListView.view.width
                             height: resultsList.itemHeight
                             radius: Theme.cornerRadius
-                            color: ListView.isCurrentItem ? Theme.primaryPressed :
-                                                            listMouseArea.containsMouse
-                                                            ? Theme.primaryHoverLight :
-                                                              Theme.itemBackground
-                            border.color: ListView.isCurrentItem ? Theme.primarySelected :
+                            color: ListView.isCurrentItem ? Theme.primarySelected : "transparent"
+                            border.color: ListView.isCurrentItem ? Theme.primary :
                                                                    Theme.outlineMedium
-                            border.width: ListView.isCurrentItem ? 2 : 1
+                            border.width: 1
+
+                            StateOverlay {
+                                hovered: listMouseArea.containsMouse
+                                pressed: listMouseArea.pressed
+                            }
 
                             Row {
                                 anchors.fill: parent
