@@ -101,6 +101,8 @@ Variants {
                     }
                 }
 
+                GamepadIndicator {}
+
                 WifiButton {
                     id: wifiButton
 
