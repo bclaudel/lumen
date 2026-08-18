@@ -214,11 +214,14 @@ Modal {
                                     }
 
                                     StyledText {
+                                        id: descriptionText
+
                                         width: parent.width
                                         text: item.model.comment || ""
                                         color: Theme.surfaceVariantText
                                         font.pixelSize: Theme.fontSizeMedium
                                         elide: Text.ElideRight
+                                        wrapMode: Text.NoWrap
                                         visible: resultsList.showDescription && item.model.comment
                                                  !== ""
                                     }
@@ -237,6 +240,12 @@ Modal {
                                         resultsList.itemClicked(item.index, item.model);
                                     }
                                 }
+                            }
+
+                            StyledToolTip {
+                                text: item.model.comment || ""
+                                visible: listMouseArea.containsMouse && descriptionText.truncated
+                                width: 420
                             }
                         }
                     }
