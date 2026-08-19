@@ -26,7 +26,7 @@ Scope {
         property color textColor: Theme.surfaceText
 
         color: Theme.descriptionBackground
-        radius: 18
+        radius: Theme.cornerRadius
         implicitHeight: descriptionLabelText.implicitHeight + Theme.spacingXL
         implicitWidth: descriptionLabelText.implicitWidth + Theme.spacingXL
 

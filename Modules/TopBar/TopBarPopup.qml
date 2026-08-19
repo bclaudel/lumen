@@ -110,7 +110,7 @@ PanelWindow {
         clip: true
         color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
         height: root.popupHeight
-        radius: Theme.cornerRadius + 12
+        radius: Theme.cornerRadius
         width: root.popupWidth
 
         Rectangle {

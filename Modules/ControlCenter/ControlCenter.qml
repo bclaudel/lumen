@@ -130,7 +130,7 @@ PanelWindow {
                 border.color: Theme.withAlpha(Theme.outline, 0.16)
                 border.width: 1
                 color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
-                radius: Theme.cornerRadius + 12
+                radius: Theme.cornerRadius
 
                 Rectangle {
                     anchors.fill: parent

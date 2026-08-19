@@ -31,7 +31,7 @@ Controls.AbstractButton {
                                                                                    0.38)
 
         StateOverlay {
-            cornerRadius: Theme.cornerRadius + 6
+            cornerRadius: Theme.cornerRadius
             hovered: root.hovered
             pressed: root.down
             focused: root.visualFocus

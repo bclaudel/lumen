@@ -20,7 +20,7 @@ Rectangle {
     color: Theme.withAlpha(Theme.surfaceContainer, 0.92)
     implicitHeight: 58
     implicitWidth: 280
-    radius: Theme.cornerRadius + 6
+    radius: Theme.cornerRadius
 
     Rectangle {
         anchors.fill: parent
