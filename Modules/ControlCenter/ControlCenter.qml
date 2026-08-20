@@ -98,7 +98,7 @@ PanelWindow {
         id: grab
 
         active: root.isOpen
-        windows: [root]
+        windows: [root].concat(TopBarService.windows)
 
         onCleared: () => {
             root.closeControlCenter();

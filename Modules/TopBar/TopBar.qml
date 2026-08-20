@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Variants {
@@ -55,6 +56,9 @@ Variants {
             right: true
             top: true
         }
+
+        Component.onCompleted: TopBarService.registerWindow(barWindow)
+        Component.onDestruction: TopBarService.unregisterWindow(barWindow)
 
         Item {
             id: barContent

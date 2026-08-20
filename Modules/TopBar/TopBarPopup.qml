@@ -94,7 +94,7 @@ PanelWindow {
 
     HyprlandFocusGrab {
         active: root.visible
-        windows: [root]
+        windows: [root].concat(TopBarService.windows)
 
         onCleared: root.close()
     }
