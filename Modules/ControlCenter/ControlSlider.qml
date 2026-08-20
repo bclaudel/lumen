@@ -15,6 +15,7 @@ ControlCenterSurface {
     property string iconName: ""
     property string statusText: ""
     property string title: ""
+    property real trackHeight: 24
     property string unavailableText: "Unavailable"
     property real value: 0
 
@@ -79,7 +80,7 @@ ControlCenterSurface {
             background: Rectangle {
                 x: slider.leftPadding
                 y: slider.topPadding + (slider.availableHeight - height) / 2
-                implicitHeight: 34
+                implicitHeight: root.trackHeight
                 implicitWidth: 200
                 width: slider.availableWidth
                 height: implicitHeight
@@ -106,7 +107,7 @@ ControlCenterSurface {
             handle: Rectangle {
                 x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
                 y: slider.topPadding + (slider.availableHeight - height) / 2
-                implicitHeight: 26
+                implicitHeight: root.trackHeight - Theme.spacingS
                 implicitWidth: 3
                 color: Theme.primaryText
                 opacity: slider.pressed ? Theme.opacityHigh : 0
