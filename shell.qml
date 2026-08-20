@@ -20,6 +20,8 @@ ShellRoot {
             gamingPopup.close();
         if (activeSurface !== launcher)
             launcher.hide();
+        if (activeSurface !== performancePopup)
+            performancePopup.close();
         if (activeSurface !== session)
             session.closeSessionScreen();
         if (activeSurface !== systemTrayPopup)
@@ -42,6 +44,8 @@ ShellRoot {
         osdActive: onScreenDisplay.popupActive
         osdIcon: onScreenDisplay.indicatorIcon
         osdScreen: onScreenDisplay.targetScreen
+        performancePopupOpen: performancePopup.visible
+        performancePopupScreen: performancePopup.targetScreen
         wifiPopupOpen: wifiPopup.visible
         wifiPopupScreen: wifiPopup.targetScreen
 
@@ -56,6 +60,9 @@ ShellRoot {
             gamingPopup.toggle(anchorItem, screen);
         }
         onLauncherRequested: screen => launcher.toggle(screen)
+        onPerformancePopupRequested: (anchorItem, screen) => {
+            performancePopup.toggle(anchorItem, screen);
+        }
         onTrayMenuRequested: (trayItem, anchorItem, screen) => {
             controlCenter.closeControlCenter();
             systemTrayPopup.showMenu(trayItem, anchorItem, screen);
@@ -108,6 +115,15 @@ ShellRoot {
         id: onScreenDisplay
 
         suppressed: controlCenter.isOpen
+    }
+
+    SystemPerformancePopup {
+        id: performancePopup
+
+        onVisibleChanged: {
+            if (performancePopup.visible)
+                root.activateExclusiveSurface(performancePopup);
+        }
     }
 
     Session {

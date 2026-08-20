@@ -167,6 +167,16 @@ Singleton {
         return withAlpha(surfaceContainer, transparency);
     }
 
+    function utilizationColor(value, available = true) {
+        if (!available)
+            return surfaceTextMedium;
+        if (value >= 90)
+            return error;
+        if (value >= 75)
+            return warning;
+        return surfaceText;
+    }
+
     function withAlpha(color, alpha) {
         return Qt.rgba(color.r, color.g, color.b, alpha);
     }

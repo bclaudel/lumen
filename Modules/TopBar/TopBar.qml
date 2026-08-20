@@ -20,6 +20,8 @@ Variants {
     property bool osdActive: false
     property string osdIcon: ""
     property var osdScreen: null
+    property bool performancePopupOpen: false
+    property var performancePopupScreen: null
     property bool wifiPopupOpen: false
     property var wifiPopupScreen: null
     property real backgroundTransparency: SettingsData.topBarTransparency
@@ -28,6 +30,7 @@ Variants {
     signal controlCenterRequested(var screen)
     signal gamingPopupRequested(var anchorItem, var screen)
     signal launcherRequested(var screen)
+    signal performancePopupRequested(var anchorItem, var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
     signal wifiPopupRequested(var anchorItem, var screen)
@@ -102,6 +105,16 @@ Variants {
                     onOverflowRequested: (anchorItem, screen) => {
                         root.trayOverflowRequested(anchorItem, screen);
                     }
+                }
+
+                SystemPerformanceButton {
+                    id: performanceButton
+
+                    active: root.performancePopupOpen && root.performancePopupScreen
+                            === barWindow.modelData
+
+                    onClicked: root.performancePopupRequested(performanceButton,
+                                                              barWindow.modelData)
                 }
 
                 GamingButton {
