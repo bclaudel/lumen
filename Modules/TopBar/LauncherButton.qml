@@ -10,7 +10,6 @@ TopBarButton {
     id: root
 
     accessibleName: "Open launcher"
-    tooltipText: "Launcher"
 
     contentItem: Item {
         IconImage {
