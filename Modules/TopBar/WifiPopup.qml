@@ -13,7 +13,7 @@ import qs.Widgets
 TopBarPopup {
     id: root
 
-    property bool otherNetworksExpanded: false
+    property bool otherNetworksExpanded: true
     property string selectedSsid: ""
 
     function cancelPasswordEntry() {
@@ -48,7 +48,7 @@ TopBarPopup {
     onVisibleChanged: {
         NetworkService.wifiPopupOpen = visible;
         if (visible) {
-            otherNetworksExpanded = false;
+            otherNetworksExpanded = true;
             cancelPasswordEntry();
         } else if (!relocating) {
             otherNetworksExpanded = false;
