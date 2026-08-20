@@ -13,6 +13,11 @@ import qs.Widgets
 TopBarPopup {
     id: root
 
+    onVisibleChanged: {
+        if (visible)
+        BluetoothService.refreshConnectionState();
+    }
+
     content: Component {
         ColumnLayout {
             spacing: Theme.spacingXS

@@ -12,7 +12,7 @@ Controls.AbstractButton {
     id: root
 
     required property var device
-    readonly property bool connected: device?.connected ?? false
+    readonly property bool connected: BluetoothService.isDeviceConnected(device)
     readonly property bool transitioning: BluetoothService.isDeviceTransitioning(device)
 
     Accessible.description: BluetoothService.deviceStatus(device)

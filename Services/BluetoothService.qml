@@ -5,6 +5,7 @@ import QtQuick
 
 import Quickshell
 import Quickshell.Bluetooth
+import Quickshell.Io
 
 Singleton {
     id: root
@@ -12,6 +13,8 @@ Singleton {
     readonly property BluetoothAdapter adapter: Bluetooth.defaultAdapter
     readonly property bool adapterTransitioning: adapter?.state === BluetoothAdapterState.Disabling
     readonly property bool available: adapter !== null
+    property var connectedAddresses: []
+    property bool connectionStateLoaded: false
     readonly property bool enabled: adapter?.enabled === true || adapter?.state
                                     === BluetoothAdapterState.Enabled || adapter?.state
                                     === BluetoothAdapterState.Enabling
@@ -19,8 +22,10 @@ Singleton {
         const devices = adapter?.devices.values.filter(device => device.paired || device.bonded)
         ?? [];
         return devices.slice().sort((left, right) => {
-            if (left.connected !== right.connected)
-                return left.connected ? -1 : 1;
+            const leftConnected = root.isDeviceConnected(left);
+            const rightConnected = root.isDeviceConnected(right);
+            if (leftConnected !== rightConnected)
+                return leftConnected ? -1 : 1;
             return root.deviceName(left).localeCompare(root.deviceName(right));
         });
     }
@@ -30,8 +35,33 @@ Singleton {
         if (!enabled)
         return "Off";
 
-        const connectedDevice = adapter.devices.values.find(device => device.connected);
+        const connectedDevice = adapter.devices.values.find(device => root.isDeviceConnected(
+                                                                          device));
         return connectedDevice?.name || "On";
+    }
+
+    function isDeviceConnected(device) {
+        if (!connectionStateLoaded)
+            return device?.connected ?? false;
+
+        const address = (device?.address ?? "").toUpperCase();
+        return address !== "" && connectedAddresses.includes(address);
+    }
+
+    function refreshConnectionState() {
+        if (!enabled) {
+            connectedAddresses = [];
+            connectionStateLoaded = true;
+            return;
+        }
+
+        if (connectedDevicesQuery.running) {
+            connectedDevicesQuery.refreshPending = true;
+            return;
+        }
+
+        connectedDevicesQuery.parsedAddresses = [];
+        connectedDevicesQuery.running = true;
     }
 
     function deviceIcon(device) {
@@ -72,15 +102,14 @@ Singleton {
     }
 
     function deviceStatus(device) {
-        let status = "Disconnected";
-        if (device?.state === BluetoothDeviceState.Connected)
-            status = "Connected";
-        else if (device?.state === BluetoothDeviceState.Connecting)
+        const connected = root.isDeviceConnected(device);
+        let status = connected ? "Connected" : "Disconnected";
+        if (device?.state === BluetoothDeviceState.Connecting && !connected)
             status = "Connecting…";
-        else if (device?.state === BluetoothDeviceState.Disconnecting)
+        else if (device?.state === BluetoothDeviceState.Disconnecting && connected)
             status = "Disconnecting…";
 
-        if (device?.connected && device?.batteryAvailable)
+        if (connected && device?.batteryAvailable)
             status += " · " + Math.round(device.battery * 100) + "%";
         return status;
     }
@@ -95,16 +124,74 @@ Singleton {
     }
 
     function setEnabled(enabled) {
-        if (adapter)
+        if (adapter) {
             adapter.enabled = enabled;
+            connectionRefreshTimer.restart();
+        }
     }
 
     function toggleDeviceConnection(device) {
         if (!device || isDeviceTransitioning(device))
             return;
-        if (device.connected)
+        if (root.isDeviceConnected(device))
             device.disconnect();
         else
             device.connect();
+        connectionRefreshTimer.restart();
+    }
+
+    Component.onCompleted: refreshConnectionState()
+
+    onEnabledChanged: refreshConnectionState()
+
+    Timer {
+        id: connectionRefreshTimer
+
+        interval: 1000
+        onTriggered: root.refreshConnectionState()
+    }
+
+    Timer {
+        interval: 5000
+        repeat: true
+        running: root.enabled
+
+        onTriggered: root.refreshConnectionState()
+    }
+
+    Process {
+        id: connectedDevicesQuery
+
+        property var parsedAddresses: []
+        property bool refreshPending: false
+
+        command: ["bluetoothctl", "devices", "Connected"]
+        running: false
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const addresses = [];
+                for (const line of text.trim().split("\n")) {
+                    const match = line.match(/^Device\s+([0-9A-Fa-f:]{17})(?:\s|$)/);
+                    if (match)
+                    addresses.push(match[1].toUpperCase());
+                }
+                connectedDevicesQuery.parsedAddresses = addresses;
+            }
+        }
+
+        // qmllint disable signal-handler-parameters
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.connectedAddresses = parsedAddresses;
+                root.connectionStateLoaded = true;
+            }
+
+            if (refreshPending) {
+                refreshPending = false;
+                Qt.callLater(() => root.refreshConnectionState());
+            }
+        }
+        // qmllint enable signal-handler-parameters
     }
 }

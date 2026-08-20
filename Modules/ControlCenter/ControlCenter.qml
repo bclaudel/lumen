@@ -41,6 +41,7 @@ PanelWindow {
         targetScreen = resolvedScreen;
         BrightnessService.setTargetScreen(resolvedScreen);
         NetworkService.refreshNetworkState();
+        BluetoothService.refreshConnectionState();
 
         if (screenChanged) {
             Qt.callLater(() => {
