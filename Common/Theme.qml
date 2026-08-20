@@ -29,6 +29,7 @@ Singleton {
     property real iconSizeLarge: 32
     property real iconSizeSmall: 16
     property real topBarIconSize: iconSize - 4
+    property real topBarSurfaceOffset: barHeight - spacingXL
     property color info: "#2196F3"
     property color inputBackground: withAlpha(surfaceContainer, 0.9)
     property color itemBackground: withAlpha(surfaceVariant, 0.03)

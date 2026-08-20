@@ -92,7 +92,7 @@ PanelWindow {
     }
 
     WlrLayershell.margins.right: SettingsData.hyprlandGapsOut
-    WlrLayershell.margins.top: Theme.barHeight - Theme.spacingL + SettingsData.hyprlandGapsOut
+    WlrLayershell.margins.top: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
 
     HyprlandFocusGrab {
         id: grab

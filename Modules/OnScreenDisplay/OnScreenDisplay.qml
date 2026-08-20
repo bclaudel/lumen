@@ -184,7 +184,7 @@ Scope {
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.margins.right: SettingsData.hyprlandGapsOut
-        WlrLayershell.margins.top: Theme.barHeight - Theme.spacingL + SettingsData.hyprlandGapsOut
+        WlrLayershell.margins.top: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
         WlrLayershell.namespace: "quickshell:value-osd"
 
         mask: Region {}

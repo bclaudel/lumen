@@ -32,8 +32,7 @@ PanelWindow {
                                                                                - anchorPosition.x - (
                                                                                    anchorItem
                                                                                    ?.width ?? 0)))
-    readonly property int popupTopMargin: Theme.barHeight - Theme.spacingL
-                                          + SettingsData.hyprlandGapsOut
+    readonly property int popupTopMargin: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
     property int popupWidth: 340
     property bool relocating: false
     property var targetScreen: null
