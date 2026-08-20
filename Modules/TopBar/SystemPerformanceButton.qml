@@ -14,17 +14,8 @@ TopBarButton {
         return available ? `${Math.round(value)}%` : "--";
     }
 
-    function tooltipDescription() {
-        return "CPU " + metricText(SystemPerformanceService.cpuAvailable,
-                                   SystemPerformanceService.cpuUsage) + " · GPU " + metricText(
-                    SystemPerformanceService.gpuAvailable, SystemPerformanceService.gpuUsage)
-                + " · RAM " + metricText(SystemPerformanceService.memoryAvailable,
-                                         SystemPerformanceService.memoryUsage);
-    }
-
     accessibleName: "System performance"
     buttonWidth: metricRow.implicitWidth + 2 * Theme.spacingM
-    tooltipText: tooltipDescription()
 
     contentItem: Item {
         RowLayout {
