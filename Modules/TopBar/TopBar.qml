@@ -13,6 +13,8 @@ Variants {
     property var bluetoothPopupScreen: null
     property bool controlCenterOpen: false
     property var controlCenterScreen: null
+    property bool gamingPopupOpen: false
+    property var gamingPopupScreen: null
     property bool launcherOpen: false
     property var launcherScreen: null
     property bool osdActive: false
@@ -24,6 +26,7 @@ Variants {
 
     signal bluetoothPopupRequested(var anchorItem, var screen)
     signal controlCenterRequested(var screen)
+    signal gamingPopupRequested(var anchorItem, var screen)
     signal launcherRequested(var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
@@ -101,7 +104,13 @@ Variants {
                     }
                 }
 
-                GamepadIndicator {}
+                GamingButton {
+                    id: gamingButton
+
+                    active: root.gamingPopupOpen && root.gamingPopupScreen === barWindow.modelData
+
+                    onClicked: root.gamingPopupRequested(gamingButton, barWindow.modelData)
+                }
 
                 WifiButton {
                     id: wifiButton

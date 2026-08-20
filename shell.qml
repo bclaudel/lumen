@@ -16,6 +16,8 @@ ShellRoot {
             bluetoothPopup.close();
         if (activeSurface !== controlCenter)
             controlCenter.closeControlCenter();
+        if (activeSurface !== gamingPopup)
+            gamingPopup.close();
         if (activeSurface !== launcher)
             launcher.hide();
         if (activeSurface !== session)
@@ -33,6 +35,8 @@ ShellRoot {
         bluetoothPopupScreen: bluetoothPopup.targetScreen
         controlCenterOpen: controlCenter.isOpen
         controlCenterScreen: controlCenter.targetScreen
+        gamingPopupOpen: gamingPopup.visible
+        gamingPopupScreen: gamingPopup.targetScreen
         launcherOpen: launcher.visible
         launcherScreen: launcher.targetScreen
         osdActive: onScreenDisplay.popupActive
@@ -47,6 +51,9 @@ ShellRoot {
         onControlCenterRequested: screen => {
             systemTrayPopup.close();
             controlCenter.toggleControlCenter(screen);
+        }
+        onGamingPopupRequested: (anchorItem, screen) => {
+            gamingPopup.toggle(anchorItem, screen);
         }
         onLauncherRequested: screen => launcher.toggle(screen)
         onTrayMenuRequested: (trayItem, anchorItem, screen) => {
@@ -85,6 +92,15 @@ ShellRoot {
         onSessionRequested: screen => {
             controlCenter.closeControlCenter();
             session.openSessionScreen(screen);
+        }
+    }
+
+    GamingPopup {
+        id: gamingPopup
+
+        onVisibleChanged: {
+            if (gamingPopup.visible)
+                root.activateExclusiveSurface(gamingPopup);
         }
     }
 

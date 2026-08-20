@@ -11,6 +11,16 @@ Singleton {
 
     property int batteryLevel: 0
     property bool connected: false
+    readonly property var devices: [
+        {
+            "batteryAvailable": root.connected,
+            "batteryLevel": root.batteryLevel,
+            "connected": root.connected,
+            "icon": "sports_esports",
+            "id": "scuf-envision-pro",
+            "name": "SCUF Envision Pro"
+        }
+    ]
     readonly property string statusText: connected ? `SCUF Envision Pro · ${batteryLevel}%` :
                                                      "SCUF Envision Pro disconnected"
 
