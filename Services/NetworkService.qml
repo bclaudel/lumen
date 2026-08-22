@@ -111,6 +111,93 @@ Singleton {
         return "poor";
     }
 
+    function applyNetworkStatus(contents) {
+        let hasEthernet = false;
+        let hasWifi = false;
+        let detectedWifiDevice = "";
+
+        for (const line of contents.trim().split("\n")) {
+            if (!line)
+                continue;
+
+            const parts = parseNmcliLine(line);
+            const device = parts[0] || "";
+            const type = parts[1] || "";
+            const state = parts[2] || "";
+
+            if (type === "wifi" && detectedWifiDevice === "")
+                detectedWifiDevice = device;
+            if (!state.startsWith("connected"))
+                continue;
+            if (type === "ethernet")
+                hasEthernet = true;
+            else if (type === "wifi")
+                hasWifi = true;
+        }
+
+        wifiDevice = detectedWifiDevice;
+        if (hasEthernet) {
+            networkStatus = "ethernet";
+            wifiSignalStrengthStr = "excellent";
+        } else if (hasWifi) {
+            networkStatus = "wifi";
+        } else {
+            networkStatus = "disconnected";
+            wifiSignalStrengthStr = "excellent";
+        }
+    }
+
+    function applyWifiRadio(contents) {
+        const enabled = contents.trim() === "enabled";
+        wifiEnabled = enabled;
+        if (!enabled) {
+            accessPoints = [];
+            wifiSsid = "";
+        } else {
+            if (accessPoints.length === 0)
+                refreshWifiNetworks(false, false);
+            if (wifiPopupOpen)
+                networkRefreshTimer.restart();
+        }
+    }
+
+    function applyWifiScan(contents) {
+        const bySsid = {};
+        for (const line of contents.trim().split("\n")) {
+            if (!line)
+                continue;
+
+            const parts = parseNmcliLine(line);
+            const ssid = parts[1] || "";
+            if (ssid === "")
+                continue;
+
+            const security = parts[4] || "";
+            const accessPoint = {
+                "active": parts[0] === "*",
+                "bssid": parts[2] || "",
+                "enterprise": security.includes("802.1X") || security.includes("EAP"),
+                "secured": security !== "" && security !== "--",
+                "security": security,
+                "signal": parseInt(parts[3]) || 0,
+                "ssid": ssid
+            };
+            const current = bySsid[ssid];
+            if (!current || accessPoint.active || (!current.active && accessPoint.signal
+                                                   > current.signal))
+                bySsid[ssid] = accessPoint;
+        }
+
+        accessPoints = Object.values(bySsid);
+        const activeNetwork = accessPoints.find(network => network.active);
+        if (activeNetwork) {
+            wifiSsid = activeNetwork.ssid;
+            wifiSignalStrengthStr = getSignalQuality(activeNetwork.signal);
+        } else {
+            wifiSsid = "";
+        }
+    }
+
     function openWifiSettings() {
         Quickshell.execDetached(["nm-connection-editor"]);
     }
@@ -249,7 +336,7 @@ Singleton {
         onTriggered: {
             root.refreshNetworkState();
             if (root.wifiPopupOpen && !root.networkSelectionActive)
-            networkRefreshTimer.restart();
+                networkRefreshTimer.restart();
         }
     }
 
@@ -318,55 +405,29 @@ Singleton {
     Process {
         id: networkStatusQuery
 
+        property string capturedOutput: ""
+
         command: ["nmcli", "-t", "--escape", "yes", "-f", "DEVICE,TYPE,STATE", "device", "status"]
         running: false
 
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.trim() !== "") {
-                    root.networkStatus = "disconnected";
-                    root.wifiSignalStrengthStr = "excellent";
-                }
-            }
-        }
+        stderr: StdioCollector {}
 
         stdout: StdioCollector {
-            onStreamFinished: {
-                let hasEthernet = false;
-                let hasWifi = false;
-                let wifiDevice = "";
+            onStreamFinished: networkStatusQuery.capturedOutput = text
+        }
 
-                for (const line of text.trim().split("\n")) {
-                    if (!line)
-                    continue;
+        onStarted: capturedOutput = ""
 
-                    const parts = root.parseNmcliLine(line);
-                    const device = parts[0] || "";
-                    const type = parts[1] || "";
-                    const state = parts[2] || "";
-
-                    if (type === "wifi" && wifiDevice === "")
-                    wifiDevice = device;
-                    if (!state.startsWith("connected"))
-                    continue;
-                    if (type === "ethernet")
-                    hasEthernet = true;
-                    else if (type === "wifi")
-                    hasWifi = true;
-                }
-
-                root.wifiDevice = wifiDevice;
-                if (hasEthernet) {
-                    root.networkStatus = "ethernet";
-                    root.wifiSignalStrengthStr = "excellent";
-                } else if (hasWifi) {
-                    root.networkStatus = "wifi";
-                } else {
-                    root.networkStatus = "disconnected";
-                    root.wifiSignalStrengthStr = "excellent";
-                }
+        // qmllint disable signal-handler-parameters
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.applyNetworkStatus(capturedOutput);
+            } else {
+                root.networkStatus = "disconnected";
+                root.wifiSignalStrengthStr = "excellent";
             }
         }
+        // qmllint enable signal-handler-parameters
     }
 
     Process {
@@ -381,7 +442,7 @@ Singleton {
                 let activeUuid = "";
                 for (const line of text.trim().split("\n")) {
                     if (!line)
-                    continue;
+                        continue;
                     const parts = root.parseNmcliLine(line);
                     if (parts[1] === "802-11-wireless") {
                         activeUuid = parts[0] || "";
@@ -396,31 +457,27 @@ Singleton {
     Process {
         id: wifiRadioQuery
 
+        property string capturedOutput: ""
+
         command: ["nmcli", "-t", "-f", "WIFI", "radio"]
         running: false
 
-        stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.trim() !== "")
-                root.wifiEnabled = false;
-            }
-        }
+        stderr: StdioCollector {}
 
         stdout: StdioCollector {
-            onStreamFinished: {
-                const enabled = text.trim() === "enabled";
-                root.wifiEnabled = enabled;
-                if (!enabled) {
-                    root.accessPoints = [];
-                    root.wifiSsid = "";
-                } else {
-                    if (root.accessPoints.length === 0)
-                    root.refreshWifiNetworks(false, false);
-                    if (root.wifiPopupOpen)
-                    networkRefreshTimer.restart();
-                }
-            }
+            onStreamFinished: wifiRadioQuery.capturedOutput = text
         }
+
+        onStarted: capturedOutput = ""
+
+        // qmllint disable signal-handler-parameters
+        onExited: exitCode => {
+            if (exitCode === 0)
+                root.applyWifiRadio(capturedOutput);
+            else
+                root.wifiEnabled = false;
+        }
+        // qmllint enable signal-handler-parameters
     }
 
     Process {
@@ -435,12 +492,12 @@ Singleton {
                 const candidates = [];
                 for (const line of text.trim().split("\n")) {
                     if (!line)
-                    continue;
+                        continue;
                     const parts = root.parseNmcliLine(line);
                     if (parts[1] === "802-11-wireless" && (parseInt(parts[2]) || 0) > 0)
-                    candidates.push({
-                                        "uuid": parts[0]
-                                    });
+                        candidates.push({
+                                            "uuid": parts[0]
+                                        });
                 }
                 root.profileCandidates = candidates;
                 root.profileQueryIndex = 0;
@@ -488,53 +545,34 @@ Singleton {
     Process {
         id: wifiScanQuery
 
+        property string capturedError: ""
+        property string capturedOutput: ""
+
         running: false
 
         stderr: StdioCollector {
-            onStreamFinished: {
-                if (text.trim() !== "")
-                root.scanError = root.formatError(text);
-            }
+            onStreamFinished: wifiScanQuery.capturedError = text
         }
 
         stdout: StdioCollector {
-            onStreamFinished: {
-                const bySsid = {};
-                for (const line of text.trim().split("\n")) {
-                    if (!line)
-                    continue;
+            onStreamFinished: wifiScanQuery.capturedOutput = text
+        }
 
-                    const parts = root.parseNmcliLine(line);
-                    const ssid = parts[1] || "";
-                    if (ssid === "")
-                    continue;
+        onStarted: {
+            capturedError = "";
+            capturedOutput = "";
+        }
 
-                    const security = parts[4] || "";
-                    const accessPoint = {
-                        "active": parts[0] === "*",
-                        "bssid": parts[2] || "",
-                        "enterprise": security.includes("802.1X") || security.includes("EAP"),
-                        "secured": security !== "" && security !== "--",
-                        "security": security,
-                        "signal": parseInt(parts[3]) || 0,
-                        "ssid": ssid
-                    };
-                    const current = bySsid[ssid];
-                    if (!current || accessPoint.active || (!current.active && accessPoint.signal
-                                                           > current.signal))
-                    bySsid[ssid] = accessPoint;
-                }
-
-                root.accessPoints = Object.values(bySsid);
-                const activeNetwork = root.accessPoints.find(network => network.active);
-                if (activeNetwork) {
-                    root.wifiSsid = activeNetwork.ssid;
-                    root.wifiSignalStrengthStr = root.getSignalQuality(activeNetwork.signal);
-                } else {
-                    root.wifiSsid = "";
-                }
+        // qmllint disable signal-handler-parameters
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.scanError = "";
+                root.applyWifiScan(capturedOutput);
+            } else {
+                root.scanError = root.formatError(capturedError);
             }
         }
+        // qmllint enable signal-handler-parameters
     }
 
     Process {
