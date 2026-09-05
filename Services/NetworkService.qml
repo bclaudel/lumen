@@ -141,9 +141,12 @@ Singleton {
             wifiSignalStrengthStr = "excellent";
         } else if (hasWifi) {
             networkStatus = "wifi";
+            if (!networkSelectionActive)
+                networkRefreshTimer.restart();
         } else {
             networkStatus = "disconnected";
             wifiSignalStrengthStr = "excellent";
+            wifiSsid = "";
         }
     }
 
@@ -425,6 +428,7 @@ Singleton {
             } else {
                 root.networkStatus = "disconnected";
                 root.wifiSignalStrengthStr = "excellent";
+                root.wifiSsid = "";
             }
         }
         // qmllint enable signal-handler-parameters
