@@ -337,6 +337,11 @@ TopBarPopup {
                         size: Theme.iconSizeSmall
                     }
                 }
+
+                onClicked: {
+                    root.close();
+                    NetworkService.openWifiSettings();
+                }
             }
         }
     }
