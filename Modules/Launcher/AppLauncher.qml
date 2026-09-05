@@ -46,6 +46,11 @@ Item {
     }
 
     function launchSelected() {
+        if (searchDebounceTimer.running) {
+            searchDebounceTimer.stop();
+            updateFilteredModel();
+        }
+
         if (filteredModel.count > 0 && selectedIndex >= 0 && selectedIndex < filteredModel.count) {
             var selectedApp = filteredModel.get(selectedIndex);
             launchApp(selectedApp);
