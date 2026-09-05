@@ -36,9 +36,12 @@ Singleton {
 
     function refresh() {
         if (writePending || applyTimer.running || brightnessQuery.running
-                || brightnessWriter.running || ddcDetect.running || ddcQuery.running)
+                || brightnessWriter.running || ddcDetect.running || ddcQuery.running) {
+            refreshRetryTimer.restart();
             return;
+        }
 
+        refreshRetryTimer.stop();
         detecting = true;
         brightnessQuery.parsed = false;
         brightnessQuery.running = true;
@@ -88,6 +91,13 @@ Singleton {
     }
 
     Component.onCompleted: refresh()
+
+    Timer {
+        id: refreshRetryTimer
+
+        interval: 250
+        onTriggered: root.refresh()
+    }
 
     IpcHandler {
         target: "brightness"
