@@ -14,9 +14,9 @@ Singleton {
     property string backend: ""
     readonly property string brightnessIcon: {
         if (value < 0.34)
-        return "brightness_low";
+            return "brightness_low";
         if (value < 0.67)
-        return "brightness_medium";
+            return "brightness_medium";
         return "brightness_high";
     }
     property string ddcBus: ""
@@ -93,12 +93,12 @@ Singleton {
         target: "brightness"
 
         function decrement(): void {
-            root.decrease();
-        }
+        root.decrease();
+    }
 
         function increment(): void {
-            root.increase();
-        }
+                                  root.increase();
+                              }
     }
 
     GlobalShortcut {
@@ -122,7 +122,7 @@ Singleton {
 
         onTriggered: {
             if (brightnessQuery.running || brightnessWriter.running || ddcDetect.running
-                || ddcQuery.running) {
+                    || ddcQuery.running) {
                 restart();
                 return;
             }
@@ -165,7 +165,7 @@ Singleton {
             if (!running && startedOnce) {
                 startedOnce = false;
                 if (!applyTimer.running)
-                confirmTimer.restart();
+                    confirmTimer.restart();
             }
         }
         onStarted: startedOnce = true
@@ -199,7 +199,7 @@ Singleton {
                 if (!isNaN(percent)) {
                     brightnessQuery.parsed = true;
                     if (root.writePending)
-                    return;
+                        return;
 
                     root.backend = "brightnessctl";
                     root.available = true;
@@ -235,7 +235,7 @@ Singleton {
                 for (const block of blocks) {
                     const busMatch = block.match(/I2C bus:\s*\/dev\/i2c-(\d+)/);
                     if (!busMatch)
-                    continue;
+                        continue;
                     const connectorMatch = block.match(/DRM connector:\s*(\S+)/);
                     displays.push({
                                       "bus": busMatch[1],
@@ -284,7 +284,7 @@ Singleton {
                 let maximum = -1;
                 let match = text.match(/current value\s*=\s*(\d+).*max value\s*=\s*(\d+)/i);
                 if (!match)
-                match = text.match(/VCP\s+10\s+C\s+(\d+)\s+(\d+)/i);
+                    match = text.match(/VCP\s+10\s+C\s+(\d+)\s+(\d+)/i);
 
                 if (match) {
                     current = parseInt(match[1]);
@@ -294,7 +294,7 @@ Singleton {
                 if (current >= 0 && maximum > 0) {
                     ddcQuery.parsed = true;
                     if (root.writePending)
-                    return;
+                        return;
 
                     root.backend = "ddcutil";
                     root.available = true;

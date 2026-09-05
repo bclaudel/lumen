@@ -200,9 +200,9 @@ TopBarPopup {
                 onClicked: {
                     root.otherNetworksExpanded = !root.otherNetworksExpanded;
                     if (root.otherNetworksExpanded)
-                    NetworkService.refreshWifiNetworks(true);
+                        NetworkService.refreshWifiNetworks(true);
                     else
-                    root.cancelPasswordEntry();
+                        root.cancelPasswordEntry();
                 }
             }
 
@@ -248,11 +248,12 @@ TopBarPopup {
 
                             onVisibleChanged: {
                                 if (visible)
-                                Qt.callLater(() => forceActiveFocus());
+                                    Qt.callLater(() => forceActiveFocus());
                             }
                             onAccepted: {
                                 if (text !== "")
-                                NetworkService.connectNetwork(otherNetworkDelegate.modelData, text);
+                                    NetworkService.connectNetwork(otherNetworkDelegate.modelData,
+                                                                  text);
                             }
                         }
 

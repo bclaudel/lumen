@@ -60,7 +60,7 @@ Singleton {
                     const response = JSON.parse(text.trim());
                     const level = Number(response.percentage);
                     if (Number.isFinite(level) && level >= 0 && level <= 100)
-                    batteryQuery.parsedLevel = Math.round(level);
+                        batteryQuery.parsedLevel = Math.round(level);
                 } catch (error) {
                     batteryQuery.parsedLevel = -1;
                 }

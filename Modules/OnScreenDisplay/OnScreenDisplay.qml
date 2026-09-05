@@ -106,7 +106,7 @@ Scope {
 
     onSuppressedChanged: {
         if (suppressed)
-        dismiss();
+            dismiss();
     }
 
     Connections {

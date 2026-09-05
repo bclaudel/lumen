@@ -140,9 +140,9 @@ ControlCenterSurface {
 
                 onClicked: {
                     if (root.selectingInput)
-                    AudioService.setSource(modelData);
+                        AudioService.setSource(modelData);
                     else
-                    AudioService.setSink(modelData);
+                        AudioService.setSink(modelData);
                     root.deviceSelected();
                 }
             }

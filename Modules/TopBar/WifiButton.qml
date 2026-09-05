@@ -27,10 +27,10 @@ TopBarButton {
                                                                  Theme.outlineButton
     iconName: {
         if (NetworkService.networkStatus === "ethernet")
-        return "lan";
+            return "lan";
 
         if (NetworkService.networkStatus === "wifi")
-        return root.getSignalIcon(NetworkService.wifiSignalStrengthStr);
+            return root.getSignalIcon(NetworkService.wifiSignalStrengthStr);
         return "wifi_off";
     }
 }

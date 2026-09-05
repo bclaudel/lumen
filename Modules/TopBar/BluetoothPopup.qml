@@ -15,7 +15,7 @@ TopBarPopup {
 
     onVisibleChanged: {
         if (visible)
-        BluetoothService.refreshConnectionState();
+            BluetoothService.refreshConnectionState();
     }
 
     content: Component {

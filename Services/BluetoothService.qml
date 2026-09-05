@@ -20,7 +20,7 @@ Singleton {
                                     === BluetoothAdapterState.Enabling
     readonly property var knownDevices: {
         const devices = adapter?.devices.values.filter(device => device.paired || device.bonded)
-        ?? [];
+              ?? [];
         return devices.slice().sort((left, right) => {
             const leftConnected = root.isDeviceConnected(left);
             const rightConnected = root.isDeviceConnected(right);
@@ -31,9 +31,9 @@ Singleton {
     }
     readonly property string statusText: {
         if (!available)
-        return "Unavailable";
+            return "Unavailable";
         if (!enabled)
-        return "Off";
+            return "Off";
 
         const connectedDevice = adapter.devices.values.find(device => root.isDeviceConnected(
                                                                           device));
@@ -174,7 +174,7 @@ Singleton {
                 for (const line of text.trim().split("\n")) {
                     const match = line.match(/^Device\s+([0-9A-Fa-f:]{17})(?:\s|$)/);
                     if (match)
-                    addresses.push(match[1].toUpperCase());
+                        addresses.push(match[1].toUpperCase());
                 }
                 connectedDevicesQuery.parsedAddresses = addresses;
             }

@@ -162,7 +162,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.down: sessionHibernate
@@ -180,7 +180,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.down: sessionShutdown
@@ -200,7 +200,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.down: sessionReboot
@@ -219,7 +219,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.down: sessionFirmwareReboot
@@ -237,7 +237,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.right: sessionShutdown
@@ -255,7 +255,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.left: sessionHibernate
@@ -274,7 +274,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.left: sessionShutdown
@@ -293,7 +293,7 @@ Scope {
                         }
                         onFocusChanged: {
                             if (focus)
-                            sessionRoot.subtitle = buttonText;
+                                sessionRoot.subtitle = buttonText;
                         }
 
                         KeyNavigation.left: sessionReboot
@@ -311,16 +311,16 @@ Scope {
 
     IpcHandler {
         function close(): void {
-            root.closeSessionScreen();
-        }
+        root.closeSessionScreen();
+    }
 
         function open(): void {
-            root.openSessionScreen(ScreenService.focusedScreen);
-        }
+                             root.openSessionScreen(ScreenService.focusedScreen);
+                         }
 
         function toggle(): void {
-            root.toggleSessionScreen(ScreenService.focusedScreen);
-        }
+        root.toggleSessionScreen(ScreenService.focusedScreen);
+    }
 
         target: "session"
     }

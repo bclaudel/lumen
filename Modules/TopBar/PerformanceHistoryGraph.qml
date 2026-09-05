@@ -31,7 +31,7 @@ Canvas {
         }
 
         if (values.length < 2)
-        return;
+            return;
 
         const step = width / Math.max(1, sampleCapacity - 1);
         const startX = width - step * (values.length - 1);
@@ -40,7 +40,7 @@ Canvas {
         context.beginPath();
         context.moveTo(startX, height);
         for (let index = 0; index < values.length; ++index)
-        context.lineTo(startX + index * step, pointY(values[index]));
+            context.lineTo(startX + index * step, pointY(values[index]));
         context.lineTo(width, height);
         context.closePath();
         const fillGradient = context.createLinearGradient(0, 0, 0, height);
@@ -54,9 +54,9 @@ Canvas {
             const x = startX + index * step;
             const y = pointY(values[index]);
             if (index === 0)
-            context.moveTo(x, y);
+                context.moveTo(x, y);
             else
-            context.lineTo(x, y);
+                context.lineTo(x, y);
         }
         context.lineWidth = 2;
         context.lineJoin = "round";

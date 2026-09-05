@@ -177,10 +177,10 @@ PanelWindow {
                                 iconName: NetworkService.wifiEnabled ? "wifi" : "wifi_off"
                                 subtitle: {
                                     if (!NetworkService.wifiEnabled)
-                                    return "Off";
+                                        return "Off";
                                     if (NetworkService.networkStatus === "wifi"
-                                        && NetworkService.wifiSsid)
-                                    return NetworkService.wifiSsid;
+                                            && NetworkService.wifiSsid)
+                                        return NetworkService.wifiSsid;
                                     return "On";
                                 }
                                 title: "Wi-Fi"

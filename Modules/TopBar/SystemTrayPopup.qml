@@ -29,7 +29,7 @@ PanelWindow {
                                           - Theme.spacingXS + 6
     readonly property real popupHeight: {
         if (mode === "overflow")
-        return overflowHeight;
+            return overflowHeight;
 
         return Math.min((targetScreen?.height ?? 686) * 0.7, menuColumn.implicitHeight + 2
                         * Theme.spacingS);
@@ -279,13 +279,13 @@ PanelWindow {
                             onClicked: {
                                 const entry = menuEntryRoot.menuEntry;
                                 if (!entry)
-                                return;
+                                    return;
 
                                 if (entry.hasChildren) {
                                     root.openSubmenu(entry);
                                 } else {
                                     if (typeof entry.triggered === "function")
-                                    entry.triggered();
+                                        entry.triggered();
                                     Qt.callLater(() => root.close());
                                 }
                             }
@@ -394,9 +394,9 @@ PanelWindow {
 
         Keys.onEscapePressed: {
             if (root.submenuStack.length > 0)
-            root.goBack();
+                root.goBack();
             else
-            root.close();
+                root.close();
         }
     }
 

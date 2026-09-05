@@ -78,7 +78,7 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 profileListQuery.parsedProfiles = text.split("\n").map(profile => profile.trim()).filter(
-                    profile => profile !== "");
+                            profile => profile !== "");
             }
         }
 

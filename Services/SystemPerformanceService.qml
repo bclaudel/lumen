@@ -182,7 +182,7 @@ Singleton {
 
         onTriggered: {
             if (!temperatureQuery.running)
-            temperatureQuery.running = true;
+                temperatureQuery.running = true;
         }
     }
 
@@ -255,7 +255,7 @@ Singleton {
             } else if (startedOnce) {
                 root.gpuAvailable = false;
                 if (!gpuRestartTimer.running)
-                gpuRestartTimer.restart();
+                    gpuRestartTimer.restart();
             }
         }
     }
