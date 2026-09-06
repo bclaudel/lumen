@@ -126,6 +126,11 @@ TopBarPopup {
                         size: Theme.iconSizeSmall
                     }
                 }
+
+                onClicked: {
+                    root.close();
+                    BluetoothService.openSettings();
+                }
             }
         }
     }
