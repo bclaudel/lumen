@@ -14,45 +14,58 @@ Rectangle {
     required property string iconName
     required property string title
     required property real usage
+    property color accent: Theme.primary
+    property string subtitle: ""
     property string leftDetail: ""
     property string rightDetail: ""
     property string temperatureText: ""
+    readonly property color metricColor: available && usage >= 75 ? Theme.utilizationColor(usage) :
+                                                                    accent
 
-    readonly property color metricColor: Theme.utilizationColor(usage, available)
-
-    Accessible.description: available ? `${Math.round(usage)} percent` : "Unavailable"
     Accessible.name: title
-    border.color: Theme.outlineStrong
+    Accessible.description: available ? Math.round(usage) + " percent" : "Unavailable"
+    border.color: Theme.withAlpha(accent, 0.16)
     border.width: 1
-    color: Theme.sectionBackground
-    implicitHeight: 120
+    color: Theme.surfaceContainerHigh
+    implicitHeight: 286
     radius: Theme.cornerRadius
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.bottomMargin: Theme.spacingS
-        anchors.leftMargin: Theme.spacingM
-        anchors.rightMargin: Theme.spacingM
-        anchors.topMargin: Theme.spacingS
-        spacing: Theme.spacingXS
+        anchors.margins: Theme.spacingL
+        spacing: Theme.spacingM
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 24
             spacing: Theme.spacingS
 
             MaterialIcon {
-                color: root.metricColor
+                color: root.accent
                 name: root.iconName
                 size: Theme.iconSize
             }
 
-            StyledText {
+            ColumnLayout {
                 Layout.fillWidth: true
-                color: Theme.surfaceText
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.DemiBold
-                text: root.title
+                spacing: 2
+
+                StyledText {
+                    Layout.fillWidth: true
+                    color: root.accent
+                    font.pixelSize: Theme.fontSizeLarge
+                    font.weight: Font.DemiBold
+                    text: root.title
+                    wrapMode: Text.NoWrap
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    color: Theme.surfaceTextMedium
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: root.subtitle
+                    visible: text !== ""
+                    wrapMode: Text.NoWrap
+                }
             }
 
             StyledText {
@@ -60,57 +73,53 @@ Rectangle {
                 font.pixelSize: Theme.fontSizeSmall
                 text: root.temperatureText
                 visible: text !== ""
-            }
-
-            StyledText {
-                Layout.preferredWidth: 42
-                color: root.metricColor
-                font.pixelSize: Theme.fontSizeMedium
-                font.weight: Font.DemiBold
-                horizontalAlignment: Text.AlignRight
-                text: root.available ? `${Math.round(root.usage)}%` : "--"
+                wrapMode: Text.NoWrap
             }
         }
 
-        Item {
+        GridLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 48
+            Layout.fillHeight: true
+            columns: 1
+            columnSpacing: Theme.spacingL
+            rowSpacing: Theme.spacingS
 
-            PerformanceHistoryGraph {
-                anchors.fill: parent
-                graphColor: root.metricColor
-                values: root.history
-                visible: root.available
+            UsageGauge {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.preferredWidth: 112
+                Layout.preferredHeight: 112
+                accent: root.metricColor
+                available: root.available
+                caption: "Usage"
+                value: root.usage
             }
 
-            StyledText {
-                anchors.centerIn: parent
-                color: Theme.surfaceTextMedium
-                font.pixelSize: Theme.fontSizeSmall
-                text: "Metrics unavailable"
-                visible: !root.available
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 20
-
-            StyledText {
+            ColumnLayout {
                 Layout.fillWidth: true
-                color: Theme.surfaceTextMedium
-                elide: Text.ElideRight
-                font.pixelSize: Theme.fontSizeSmall
-                text: root.leftDetail
-                wrapMode: Text.NoWrap
-            }
+                spacing: Theme.spacingXS
 
-            StyledText {
-                color: Theme.surfaceTextMedium
-                font.pixelSize: Theme.fontSizeSmall
-                horizontalAlignment: Text.AlignRight
-                text: root.rightDetail
-                wrapMode: Text.NoWrap
+                StyledText {
+                    Layout.fillWidth: true
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: root.leftDetail
+                    wrapMode: Text.NoWrap
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    color: Theme.surfaceTextMedium
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: root.rightDetail
+                    wrapMode: Text.NoWrap
+                }
+
+                PerformanceHistoryGraph {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 32
+                    graphColor: root.accent
+                    values: root.history
+                    visible: root.available
+                }
             }
         }
     }
