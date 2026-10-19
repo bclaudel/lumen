@@ -18,6 +18,7 @@ Scope {
 
     property alias isOpen: sessionLoader.active
     property var targetScreen: null
+    property int openGeneration: 0
 
     component DescriptionLabel: Rectangle {
         id: descriptionLabel
@@ -40,6 +41,7 @@ Scope {
     }
 
     function closeSessionScreen() {
+        openGeneration++;
         sessionLoader.active = false;
     }
 
@@ -48,6 +50,7 @@ Scope {
         if (!resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         const screenChanged = targetScreen !== resolvedScreen;
         if (screenChanged)
             sessionLoader.active = false;
@@ -55,6 +58,8 @@ Scope {
 
         if (screenChanged) {
             Qt.callLater(() => {
+                if (generation !== root.openGeneration)
+                    return;
                 if (ScreenService.isConnected(root.targetScreen))
                     sessionLoader.active = true;
             });
@@ -311,16 +316,16 @@ Scope {
 
     IpcHandler {
         function close(): void {
-        root.closeSessionScreen();
-    }
+            root.closeSessionScreen();
+        }
 
         function open(): void {
-                             root.openSessionScreen(ScreenService.focusedScreen);
-                         }
+            root.openSessionScreen(ScreenService.focusedScreen);
+        }
 
         function toggle(): void {
-        root.toggleSessionScreen(ScreenService.focusedScreen);
-    }
+            root.toggleSessionScreen(ScreenService.focusedScreen);
+        }
 
         target: "session"
     }

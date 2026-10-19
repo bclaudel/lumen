@@ -23,8 +23,12 @@ TopBarPopup {
     }
 
     function formatGpuPowerAndClock() {
-        return Math.round(SystemPerformanceService.gpuPowerWatts) + " W · " + Math.round(
-                    SystemPerformanceService.gpuClockMhz) + " MHz";
+        const details = [];
+        if (Number.isFinite(SystemPerformanceService.gpuPowerWatts))
+            details.push(Math.round(SystemPerformanceService.gpuPowerWatts) + " W");
+        if (Number.isFinite(SystemPerformanceService.gpuClockMhz))
+            details.push(Math.round(SystemPerformanceService.gpuClockMhz) + " MHz");
+        return details.join(" · ");
     }
 
     function formatMemoryUsage() {
@@ -92,12 +96,12 @@ TopBarPopup {
                     available: SystemPerformanceService.gpuAvailable
                     history: SystemPerformanceService.gpuHistory
                     iconName: "developer_board"
-                    leftDetail: SystemPerformanceService.gpuAvailable ? root.formatGpuMemory() : ""
-                    rightDetail: SystemPerformanceService.gpuAvailable ? root.formatGpuPowerAndClock(
-                                                                             ) : ""
-                    temperatureText: SystemPerformanceService.gpuAvailable ? root.formatTemperature(
-                                                                                 SystemPerformanceService.gpuTemperature) :
-                                                                             ""
+                    leftDetail: SystemPerformanceService.gpuMemoryAvailable ? root.formatGpuMemory(
+                                                                                  ) : ""
+                    rightDetail: root.formatGpuPowerAndClock()
+                    temperatureText: Number.isFinite(SystemPerformanceService.gpuTemperature)
+                                     ? root.formatTemperature(
+                                           SystemPerformanceService.gpuTemperature) : ""
                     title: "GPU"
                     usage: SystemPerformanceService.gpuUsage
                 }

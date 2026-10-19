@@ -23,10 +23,12 @@ PanelWindow {
                                                       + audioDeviceSelectorMaximumHeight
     readonly property int transitionDuration: 160
     property bool isOpen: false
+    property int openGeneration: 0
     property bool selectingInput: false
     property var targetScreen: null
 
     function closeControlCenter() {
+        openGeneration++;
         isOpen = false;
     }
 
@@ -35,6 +37,7 @@ PanelWindow {
         if (!resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         const screenChanged = targetScreen !== resolvedScreen;
         if (screenChanged)
             isOpen = false;
@@ -45,6 +48,8 @@ PanelWindow {
 
         if (screenChanged) {
             Qt.callLater(() => {
+                if (generation !== root.openGeneration)
+                    return;
                 if (ScreenService.isConnected(root.targetScreen))
                     root.isOpen = true;
             });

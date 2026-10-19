@@ -20,10 +20,12 @@ PanelWindow {
     property real borderWidth: 1
     property real cornerRadius: Theme.cornerRadius
     property var targetScreen: null
+    property int openGeneration: 0
 
     signal backgroundClicked
 
     function close() {
+        openGeneration++;
         if (!visible)
             return;
 
@@ -35,6 +37,7 @@ PanelWindow {
         if (!resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         if (visible && targetScreen === resolvedScreen) {
             focusScope.forceActiveFocus();
             return;
@@ -47,6 +50,8 @@ PanelWindow {
 
         if (screenChanged) {
             Qt.callLater(() => {
+                if (generation !== root.openGeneration)
+                    return;
                 if (ScreenService.isConnected(root.targetScreen)) {
                     root.visible = true;
                     focusScope.forceActiveFocus();

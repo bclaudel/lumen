@@ -20,6 +20,7 @@ Singleton {
         return "brightness_high";
     }
     property string ddcBus: ""
+    property int ddcMaximum: 100
     property bool detecting: false
     property bool monitoring: false
     property string targetConnector: ""
@@ -67,6 +68,7 @@ Singleton {
         available = false;
         backend = "";
         ddcBus = "";
+        ddcMaximum = 100;
         detecting = false;
     }
 
@@ -103,12 +105,12 @@ Singleton {
         target: "brightness"
 
         function decrement(): void {
-        root.decrease();
-    }
+            root.decrease();
+        }
 
         function increment(): void {
-                                  root.increase();
-                              }
+            root.increase();
+        }
     }
 
     GlobalShortcut {
@@ -143,7 +145,8 @@ Singleton {
                                        + "%"]);
             } else if (root.backend === "ddcutil" && root.ddcBus !== "") {
                 brightnessWriter.exec(["ddcutil", "--noverify", "-b", root.ddcBus, "setvcp", "10",
-                                       Math.max(1, percent).toString()]);
+                                       Math.max(1, Math.round(root.value
+                                                              * root.ddcMaximum)).toString()]);
             }
         }
     }
@@ -303,6 +306,7 @@ Singleton {
 
                 if (current >= 0 && maximum > 0) {
                     ddcQuery.parsed = true;
+                    root.ddcMaximum = maximum;
                     if (root.writePending)
                         return;
 

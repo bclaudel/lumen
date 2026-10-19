@@ -20,13 +20,15 @@ Singleton {
     property real cpuUsage: 0
 
     property bool gpuAvailable: false
-    property real gpuClockMhz: 0
+    property real gpuClockMhz: NaN
     property var gpuHistory: []
-    property real gpuMemoryTotalMib: 0
-    property real gpuMemoryUsedMib: 0
+    property real gpuMemoryTotalMib: NaN
+    property real gpuMemoryUsedMib: NaN
+    readonly property bool gpuMemoryAvailable: Number.isFinite(gpuMemoryUsedMib) && Number.isFinite(
+                                                   gpuMemoryTotalMib) && gpuMemoryTotalMib > 0
     property string gpuName: ""
-    property real gpuPowerWatts: 0
-    property real gpuTemperature: 0
+    property real gpuPowerWatts: NaN
+    property real gpuTemperature: NaN
     property real gpuUsage: 0
 
     property bool memoryAvailable: false
@@ -73,29 +75,42 @@ Singleton {
         previousCpuTotal = total;
     }
 
+    function invalidateGpu() {
+        gpuAvailable = false;
+        gpuUsage = 0;
+        gpuHistory = [];
+        gpuClockMhz = NaN;
+        gpuMemoryTotalMib = NaN;
+        gpuMemoryUsedMib = NaN;
+        gpuPowerWatts = NaN;
+        gpuTemperature = NaN;
+    }
+
+    function parseGpuNumber(field) {
+        if (!field)
+            return NaN;
+        const value = Number(field);
+        return Number.isFinite(value) && value >= 0 ? value : NaN;
+    }
+
     function parseGpuLine(line) {
         const fields = line.split(",").map(field => field.trim());
-        if (fields.length < 7)
+        if (fields.length < 7) {
+            invalidateGpu();
             return;
+        }
 
-        const usage = Number(fields[1]);
-        const memoryUsed = Number(fields[2]);
-        const memoryTotal = Number(fields[3]);
-        const temperature = Number(fields[4]);
-        const power = Number(fields[5]);
-        const clock = Number(fields[6]);
-        if (![usage, memoryUsed, memoryTotal, temperature, power, clock].every(Number.isFinite))
-            return;
-
+        const usage = parseGpuNumber(fields[1]);
         gpuName = fields[0];
-        gpuUsage = Math.max(0, Math.min(100, usage));
-        gpuMemoryUsedMib = memoryUsed;
-        gpuMemoryTotalMib = memoryTotal;
-        gpuTemperature = temperature;
-        gpuPowerWatts = power;
-        gpuClockMhz = clock;
-        gpuHistory = appendSample(gpuHistory, gpuUsage);
-        gpuAvailable = true;
+        gpuAvailable = Number.isFinite(usage);
+        gpuUsage = gpuAvailable ? Math.min(100, usage) : 0;
+        gpuMemoryUsedMib = parseGpuNumber(fields[2]);
+        gpuMemoryTotalMib = parseGpuNumber(fields[3]);
+        gpuTemperature = parseGpuNumber(fields[4]);
+        gpuPowerWatts = parseGpuNumber(fields[5]);
+        gpuClockMhz = parseGpuNumber(fields[6]);
+        gpuHistory = gpuAvailable ? appendSample(gpuHistory, gpuUsage) : [];
+        gpuStaleTimer.restart();
     }
 
     function parseLoadAverage(contents) {
@@ -193,6 +208,14 @@ Singleton {
         onTriggered: gpuMonitor.running = true
     }
 
+    Timer {
+        id: gpuStaleTimer
+
+        // Allow several missed samples before hiding a stalled monitor's readings.
+        interval: 7000
+        onTriggered: root.invalidateGpu()
+    }
+
     FileView {
         id: cpuStatFile
 
@@ -253,7 +276,8 @@ Singleton {
             if (running) {
                 startedOnce = true;
             } else if (startedOnce) {
-                root.gpuAvailable = false;
+                gpuStaleTimer.stop();
+                root.invalidateGpu();
                 if (!gpuRestartTimer.running)
                     gpuRestartTimer.restart();
             }

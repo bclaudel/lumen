@@ -18,6 +18,7 @@ PanelWindow {
     property var currentTrayItem: null
     property string mode: ""
     property bool relocating: false
+    property int openGeneration: 0
     property var submenuStack: []
     property var targetScreen: null
     readonly property var activeMenu: submenuStack.length > 0 ? submenuStack[submenuStack.length
@@ -45,6 +46,7 @@ PanelWindow {
     }
 
     function close() {
+        openGeneration++;
         relocating = false;
         visible = false;
     }
@@ -72,12 +74,15 @@ PanelWindow {
         if (!anchor || !resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         relocating = true;
         visible = false;
         anchorItem = anchor;
         anchorPosition = anchor.mapToItem(null, 0, 0);
         targetScreen = resolvedScreen;
         Qt.callLater(() => {
+            if (generation !== root.openGeneration)
+                return;
             if (root.anchorItem && ScreenService.isConnected(root.targetScreen)) {
                 root.visible = true;
                 popupFocus.forceActiveFocus();

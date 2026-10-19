@@ -35,9 +35,11 @@ PanelWindow {
     readonly property int popupTopMargin: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
     property int popupWidth: 340
     property bool relocating: false
+    property int openGeneration: 0
     property var targetScreen: null
 
     function close() {
+        openGeneration++;
         relocating = false;
         visible = false;
     }
@@ -47,6 +49,7 @@ PanelWindow {
         if (!anchor || !resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         const screenChanged = targetScreen !== resolvedScreen;
         relocating = screenChanged;
         if (screenChanged)
@@ -57,6 +60,8 @@ PanelWindow {
 
         if (screenChanged) {
             Qt.callLater(() => {
+                if (generation !== root.openGeneration)
+                    return;
                 if (root.anchorItem && ScreenService.isConnected(root.targetScreen)) {
                     root.visible = true;
                     popupFocus.forceActiveFocus();

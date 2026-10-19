@@ -20,6 +20,7 @@ Scope {
     property var targetScreen: null
     property int audioGeneration: 0
     property int brightnessGeneration: 0
+    property int openGeneration: 0
 
     readonly property string indicatorIcon: indicator === "brightness"
                                             ? BrightnessService.brightnessIcon :
@@ -29,6 +30,7 @@ Scope {
     readonly property string indicatorValueText: Math.round(indicatorValue * 100) + "%"
 
     function dismiss() {
+        openGeneration++;
         hideTimer.stop();
         popupShown = false;
         if (popupActive)
@@ -78,6 +80,7 @@ Scope {
         if (!resolvedScreen)
             return;
 
+        const generation = ++openGeneration;
         indicator = requestedIndicator;
         closeAnimationTimer.stop();
         hideTimer.restart();
@@ -87,9 +90,15 @@ Scope {
             popupActive = false;
             targetScreen = resolvedScreen;
             Qt.callLater(() => {
+                if (generation !== root.openGeneration)
+                    return;
                 if (!root.suppressed && ScreenService.isConnected(root.targetScreen)) {
                     root.popupActive = true;
-                    Qt.callLater(() => root.popupShown = true);
+                    Qt.callLater(() => {
+                        if (generation === root.openGeneration && !root.suppressed
+                                && ScreenService.isConnected(root.targetScreen))
+                            root.popupShown = true;
+                    });
                 }
             });
             return;
@@ -152,10 +161,7 @@ Scope {
         interval: 1000
         repeat: false
 
-        onTriggered: {
-            root.popupShown = false;
-            closeAnimationTimer.restart();
-        }
+        onTriggered: root.dismiss()
     }
 
     Timer {
