@@ -39,6 +39,9 @@ Singleton {
     property real swapTotalBytes: 0
     property real swapUsedBytes: 0
 
+    property bool psuPowerAvailable: false
+    property real psuPowerWatts: 0
+
     property real previousCpuIdle: -1
     property real previousCpuTotal: -1
 
@@ -142,8 +145,20 @@ Singleton {
     }
 
     function parseSensors(contents) {
+        psuPowerAvailable = false;
+        psuPowerWatts = 0;
         try {
             const sensors = JSON.parse(contents);
+            for (const deviceName of Object.keys(sensors)) {
+                if (!deviceName.startsWith("corsairpsu-"))
+                    continue;
+                const power = sensors[deviceName]?.["power total"]?.power1_input;
+                if (typeof power === "number" && Number.isFinite(power) && power >= 0) {
+                    psuPowerWatts = power;
+                    psuPowerAvailable = true;
+                    break;
+                }
+            }
             const preferredDevices = Object.keys(sensors).filter(name => name.startsWith(
                                                                              "k10temp-"));
             const devices = preferredDevices.concat(Object.keys(sensors).filter(name =>
@@ -191,7 +206,7 @@ Singleton {
     }
 
     Timer {
-        interval: 10000
+        interval: 2000
         repeat: true
         running: true
 
