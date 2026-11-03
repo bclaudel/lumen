@@ -18,6 +18,32 @@ Singleton {
     property bool cpuTemperatureAvailable: false
     property int cpuThreadCount: 0
     property real cpuUsage: 0
+    property bool cpuPowerAvailable: false
+    property real cpuPowerWatts: 0
+    property real cpuClockMhz: NaN
+    property var cpuPowerColumns: []
+
+    function resetCpuPower() {
+        cpuPowerAvailable = false;
+        cpuPowerWatts = 0;
+        cpuClockMhz = NaN;
+    }
+
+    function parseCpuPower(line) {
+        const reading = line.trim();
+        if (!reading)
+            return;
+        const fields = reading.split(/\s+/);
+        if (fields.includes("PkgWatt") || fields.includes("Bzy_MHz")) {
+            cpuPowerColumns = fields;
+            return;
+        }
+        const watts = parseGpuNumber(fields[cpuPowerColumns.indexOf("PkgWatt")]);
+        cpuPowerAvailable = Number.isFinite(watts);
+        cpuPowerWatts = cpuPowerAvailable ? watts : 0;
+        cpuClockMhz = parseGpuNumber(fields[cpuPowerColumns.indexOf("Bzy_MHz")]);
+        cpuPowerStaleTimer.restart();
+    }
 
     property bool gpuAvailable: false
     property real gpuClockMhz: NaN
@@ -259,6 +285,42 @@ Singleton {
         printErrors: false
 
         onLoaded: root.parseMemoryInfo(text())
+    }
+
+    Timer {
+        id: cpuPowerStaleTimer
+
+        interval: 7000
+        onTriggered: root.resetCpuPower()
+    }
+
+    Timer {
+        id: cpuPowerRestartTimer
+
+        interval: 15000
+        onTriggered: cpuPowerMonitor.running = true
+    }
+
+    Process {
+        id: cpuPowerMonitor
+
+        // -n prevents authentication prompts from a background shell service.
+        command: ["env", "LC_ALL=C", "sudo", "-n", "/usr/bin/turbostat", "--quiet", "--Summary",
+            "--show", "PkgWatt,Bzy_MHz", "--interval", "2"]
+        running: true
+
+        stdout: SplitParser {
+            splitMarker: "\n"
+
+            onRead: line => root.parseCpuPower(line)
+        }
+
+        onExited: {
+            root.cpuPowerColumns = [];
+            cpuPowerStaleTimer.stop();
+            root.resetCpuPower();
+            cpuPowerRestartTimer.restart();
+        }
     }
 
     Process {

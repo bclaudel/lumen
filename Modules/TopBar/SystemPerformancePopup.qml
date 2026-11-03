@@ -31,6 +31,16 @@ TopBarPopup {
         return details.join(" · ");
     }
 
+    function formatCpuPowerAndClock() {
+        const details = [];
+        details.push(SystemPerformanceService.cpuPowerAvailable ? Math.round(
+                                                                      SystemPerformanceService.cpuPowerWatts)
+                                                                  + " W" : "Power unavailable");
+        if (Number.isFinite(SystemPerformanceService.cpuClockMhz))
+            details.push(Math.round(SystemPerformanceService.cpuClockMhz) + " MHz");
+        return details.join(" · ");
+    }
+
     function formatMemoryUsage() {
         return formatGib(SystemPerformanceService.memoryUsedBytes) + " / " + formatGib(
                     SystemPerformanceService.memoryTotalBytes);
@@ -81,7 +91,7 @@ TopBarPopup {
                     history: SystemPerformanceService.cpuHistory
                     iconName: "memory"
                     leftDetail: `Load ${SystemPerformanceService.cpuLoadAverage.toFixed(2)}`
-                    rightDetail: `${SystemPerformanceService.cpuThreadCount} threads`
+                    rightDetail: root.formatCpuPowerAndClock()
                     temperatureText: SystemPerformanceService.cpuTemperatureAvailable
                                      ? root.formatTemperature(
                                            SystemPerformanceService.cpuTemperature) : ""
