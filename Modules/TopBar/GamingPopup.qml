@@ -13,8 +13,10 @@ TopBarPopup {
 
     onVisibleChanged: {
         LactService.monitoring = visible;
+        MouseService.monitoring = visible;
         if (visible) {
             GamepadService.refresh();
+            MouseService.refresh();
             LactService.refresh();
         }
     }
@@ -62,6 +64,15 @@ TopBarPopup {
                     Layout.fillWidth: true
                     device: modelData
                 }
+            }
+
+            GamingDeviceRow {
+                Layout.fillWidth: true
+                device: MouseService.device
+                statusText: MouseService.statusText
+                refreshEnabled: !MouseService.busy
+
+                onRefreshRequested: MouseService.refresh()
             }
 
             HorizontalSeparator {}

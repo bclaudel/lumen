@@ -10,6 +10,13 @@ Rectangle {
     id: root
 
     required property var device
+    property bool refreshEnabled: false
+    property string statusText: device.connected ? device.batteryAvailable ? "Connected · "
+                                                                             + device.batteryLevel
+                                                                             + "%" : "Connected" :
+                                                                             "Disconnected"
+
+    signal refreshRequested
 
     Accessible.description: device.connected ? device.batteryAvailable ? "Connected, "
                                                                          + device.batteryLevel
@@ -45,6 +52,7 @@ Rectangle {
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: root.device.connected ? Font.DemiBold : Font.Normal
                 text: root.device.name
+                wrapMode: Text.NoWrap
             }
 
             StyledText {
@@ -52,10 +60,8 @@ Rectangle {
                 color: Theme.surfaceTextMedium
                 elide: Text.ElideRight
                 font.pixelSize: Theme.fontSizeSmall
-                text: root.device.connected ? root.device.batteryAvailable ? "Connected · "
-                                                                             + root.device.batteryLevel
-                                                                             + "%" : "Connected" :
-                                                                             "Disconnected"
+                text: root.statusText
+                wrapMode: Text.NoWrap
             }
         }
 
@@ -63,5 +69,12 @@ Rectangle {
             Layout.rightMargin: Theme.spacingM
             Layout.preferredWidth: Theme.iconSizeSmall
         }
+    }
+
+    StateLayer {
+        enabled: root.refreshEnabled
+        visible: root.refreshEnabled
+
+        onClicked: root.refreshRequested()
     }
 }
