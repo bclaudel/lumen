@@ -96,6 +96,7 @@ PanelWindow {
 
     WlrLayershell.margins.right: popupRightMargin
     WlrLayershell.margins.top: popupTopMargin
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     HyprlandFocusGrab {
         active: root.visible
@@ -173,7 +174,12 @@ PanelWindow {
         anchors.fill: parent
         focus: root.visible
 
-        Keys.onEscapePressed: root.close()
+        Shortcut {
+            sequence: "Escape"
+            context: Qt.WindowShortcut
+            enabled: root.visible
+            onActivated: root.close()
+        }
     }
 
     Connections {

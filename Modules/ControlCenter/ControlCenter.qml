@@ -98,6 +98,7 @@ PanelWindow {
 
     WlrLayershell.margins.right: SettingsData.hyprlandGapsOut
     WlrLayershell.margins.top: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     HyprlandFocusGrab {
         id: grab
@@ -284,15 +285,17 @@ PanelWindow {
             }
         }
 
-        Keys.onPressed: event => {
-            if (event.key !== Qt.Key_Escape)
-                return;
+        Shortcut {
+            sequence: "Escape"
+            context: Qt.WindowShortcut
+            enabled: root.isOpen
 
-            if (root.audioDeviceSelectorOpen)
-                root.audioDeviceSelectorOpen = false;
-            else
-                root.closeControlCenter();
-            event.accepted = true;
+            onActivated: {
+                if (root.audioDeviceSelectorOpen)
+                    root.audioDeviceSelectorOpen = false;
+                else
+                    root.closeControlCenter();
+            }
         }
     }
 

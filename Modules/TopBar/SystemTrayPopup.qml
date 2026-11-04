@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 import Quickshell.Widgets
 
 import qs.Common
@@ -128,6 +129,7 @@ PanelWindow {
     exclusiveZone: 0
     screen: targetScreen
     visible: false
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
 
     onVisibleChanged: {
         if (!visible && !relocating) {
@@ -286,11 +288,17 @@ PanelWindow {
         anchors.fill: parent
         focus: root.visible
 
-        Keys.onEscapePressed: {
-            if (root.submenuStack.length > 0)
-                root.goBack();
-            else
-                root.close();
+        Shortcut {
+            sequence: "Escape"
+            context: Qt.WindowShortcut
+            enabled: root.visible
+
+            onActivated: {
+                if (root.submenuStack.length > 0)
+                    root.goBack();
+                else
+                    root.close();
+            }
         }
     }
 
