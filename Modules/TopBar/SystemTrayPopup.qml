@@ -37,7 +37,8 @@ PanelWindow {
 
     }
     readonly property real popupWidth: mode === "overflow" ? Math.min(overflowWidth, width - 2
-                                                                      * Theme.spacingXS) : 260
+                                                                      * Theme.spacingXS) : Math.min(
+                                                                 300, width - 2 * Theme.spacingXS)
     readonly property real popupX: {
         const preferredX = anchorPosition.x + (anchorItem?.width ?? 0) - popupWidth;
         return Math.max(Theme.spacingXS, Math.min(width - popupWidth - Theme.spacingXS,
@@ -158,10 +159,10 @@ PanelWindow {
     Rectangle {
         id: popupContent
 
-        border.color: Theme.outlineMedium
+        border.color: Theme.withAlpha(Theme.outline, 0.16)
         border.width: 1
         clip: true
-        color: Theme.popupBackground()
+        color: Theme.withAlpha(Theme.surfaceContainer, 0.9)
         height: root.popupHeight
         radius: Theme.cornerRadius
         width: root.popupWidth
@@ -221,167 +222,55 @@ PanelWindow {
             Column {
                 id: menuColumn
 
-                spacing: 1
+                spacing: Theme.spacingXS
                 width: menuFlickable.width
 
-                Rectangle {
-                    color: Theme.withAlpha(Theme.surfaceContainer, 0)
-                    height: 30
-                    radius: Theme.cornerRadius
-                    visible: root.submenuStack.length > 0
+                TrayMenuRow {
                     width: parent.width
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingS
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingXS
-
-                        MaterialIcon {
-                            name: "arrow_back"
-                            size: Theme.iconSizeSmall
-                        }
-
-                        StyledText {
-                            anchors.verticalCenter: parent.verticalCenter
-                            font.pixelSize: Theme.fontSizeSmall
-                            text: "Back"
-                        }
-                    }
-
-                    StateLayer {
-                        cornerRadius: Theme.cornerRadius
-                        stateColor: Theme.primary
-
-                        onClicked: root.goBack()
-                    }
+                    visible: root.submenuStack.length > 0
+                    entry: ({
+                                "text": "Back",
+                                "enabled": true
+                            })
+                    onClicked: root.goBack()
                 }
-
                 Repeater {
                     model: menuOpener.children
 
-                    Rectangle {
+                    Column {
                         id: menuEntryRoot
 
                         required property var modelData
-                        readonly property var menuEntry: modelData
 
-                        color: menuEntry?.isSeparator ? Theme.outlineMedium : Theme.withAlpha(
-                                                            Theme.surfaceContainer, 0)
-                        height: menuEntry?.isSeparator ? 1 : 32
-                        radius: menuEntry?.isSeparator ? 0 : Theme.cornerRadius
                         width: menuColumn.width
 
-                        MouseArea {
-                            id: entryArea
+                        Item {
+                            visible: menuEntryRoot.modelData?.isSeparator ?? false
+                            width: parent.width
+                            height: Theme.spacingM + 1
 
-                            anchors.fill: parent
-                            cursorShape: enabled ? Qt.PointingHandCursor : undefined
-                            enabled: !menuEntryRoot.menuEntry?.isSeparator
-                                     && menuEntryRoot.menuEntry?.enabled !== false
-                            hoverEnabled: true
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.rightMargin: Theme.spacingM
+                                height: 1
+                                color: Theme.withAlpha(Theme.surfaceText, 0.12)
+                            }
+                        }
+
+                        TrayMenuRow {
+                            width: parent.width
+                            entry: menuEntryRoot.modelData
+                            visible: !entry?.isSeparator
 
                             onClicked: {
-                                const entry = menuEntryRoot.menuEntry;
-                                if (!entry)
-                                    return;
-
-                                if (entry.hasChildren) {
+                                if (entry?.hasChildren) {
                                     root.openSubmenu(entry);
-                                } else {
-                                    if (typeof entry.triggered === "function")
-                                        entry.triggered();
-                                    Qt.callLater(() => root.close());
-                                }
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.surfaceHover
-                            radius: parent.radius
-                            visible: entryArea.containsMouse
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.rightMargin: Theme.spacingS
-                            spacing: Theme.spacingS
-                            visible: !menuEntryRoot.menuEntry?.isSeparator
-
-                            Item {
-                                Layout.preferredHeight: Theme.iconSizeSmall
-                                Layout.preferredWidth: Theme.iconSizeSmall
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    border.color: Theme.outline
-                                    border.width: 1
-                                    color: menuEntryRoot.menuEntry?.buttonType
-                                           === QsMenuButtonType.CheckBox && menuEntryRoot.menuEntry
-                                           ?.checkState === Qt.Checked ? Theme.primary :
-                                                                         "transparent"
-                                    radius: menuEntryRoot.menuEntry?.buttonType
-                                            === QsMenuButtonType.RadioButton ? width / 2 : 2
-                                    visible: menuEntryRoot.menuEntry?.buttonType
-                                             !== QsMenuButtonType.None
-
-                                    Rectangle {
-                                        anchors.centerIn: parent
-                                        color: Theme.primary
-                                        height: parent.height - 6
-                                        radius: height / 2
-                                        visible: menuEntryRoot.menuEntry?.buttonType
-                                                 === QsMenuButtonType.RadioButton
-                                                 && menuEntryRoot.menuEntry?.checkState
-                                                 === Qt.Checked
-                                        width: parent.width - 6
-                                    }
-
-                                    MaterialIcon {
-                                        anchors.centerIn: parent
-                                        color: Theme.primaryText
-                                        name: "check"
-                                        size: Theme.iconSizeSmall - 4
-                                        visible: menuEntryRoot.menuEntry?.buttonType
-                                                 === QsMenuButtonType.CheckBox
-                                                 && menuEntryRoot.menuEntry?.checkState
-                                                 === Qt.Checked
-                                    }
-                                }
-                            }
-
-                            Item {
-                                Layout.preferredHeight: Theme.iconSizeSmall
-                                Layout.preferredWidth: Theme.iconSizeSmall
-
-                                IconImage {
-                                    anchors.fill: parent
-                                    source: menuEntryRoot.menuEntry?.icon ?? ""
-                                    visible: source !== ""
-                                }
-                            }
-
-                            StyledText {
-                                color: menuEntryRoot.menuEntry?.enabled !== false
-                                       ? Theme.surfaceText : Theme.surfaceTextMedium
-                                elide: Text.ElideRight
-                                font.pixelSize: Theme.fontSizeSmall
-                                Layout.alignment: Qt.AlignVCenter
-                                Layout.fillWidth: true
-                                text: menuEntryRoot.menuEntry?.text ?? ""
-                            }
-
-                            Item {
-                                Layout.preferredHeight: Theme.iconSizeSmall
-                                Layout.preferredWidth: Theme.iconSizeSmall
-
-                                MaterialIcon {
-                                    anchors.centerIn: parent
-                                    name: "chevron_right"
-                                    size: Theme.iconSizeSmall
-                                    visible: menuEntryRoot.menuEntry?.hasChildren ?? false
+                                } else if (entry) {
+                                    entry.triggered();
+                                    root.close();
                                 }
                             }
                         }

@@ -10,14 +10,26 @@ Item {
     id: root
 
     required property var trayItem
+    property bool tooltipDismissed: false
 
     signal actionTriggered
     signal menuRequested(var trayItem, var anchorItem)
 
     function tooltipText() {
-        const title = trayItem.tooltipTitle || trayItem.title || trayItem.id || "";
-        const description = trayItem.tooltipDescription || "";
-        return description ? `${title}\n${description}` : title;
+        const title = cleanTooltipText(trayItem?.tooltipTitle || trayItem?.title || trayItem?.id
+                                       || "");
+        const description = cleanTooltipText(trayItem?.tooltipDescription || "");
+        return description && description !== title ? [title, description].filter(Boolean).join(
+                                                          "\n") : title;
+    }
+
+    function cleanTooltipText(text) {
+        return text.replace(/<br\s*\/?\s*>|<\/p>/gi, "\n").replace(/<[^>]*>/g, "").replace(/&lt;/g,
+                                                                                           "<").replace(
+                    /&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g,
+                                                                                         " ").replace(
+                    /&amp;/g, "&").split("\n").map(line => line.trim().replace(/\s+/g, " ")).filter(
+                    line => line !== "").join("\n");
     }
 
     implicitHeight: Theme.topBarWidgetHeight
@@ -58,6 +70,12 @@ Item {
         cursorShape: Qt.PointingHandCursor
         hoverEnabled: true
 
+        onContainsMouseChanged: {
+            if (!containsMouse)
+                root.tooltipDismissed = false;
+        }
+        onPressed: root.tooltipDismissed = true
+
         onClicked: mouse => {
             if (!root.trayItem)
                 return;
@@ -88,8 +106,9 @@ Item {
         }
     }
 
-    StyledToolTip {
+    TrayToolTip {
+        target: root
         text: root.tooltipText()
-        visible: mouseArea.containsMouse && text !== ""
+        hovered: mouseArea.containsMouse && !root.tooltipDismissed
     }
 }
