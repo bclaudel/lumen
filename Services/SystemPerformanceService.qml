@@ -6,10 +6,14 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
+import qs.Common
+
 Singleton {
     id: root
 
     readonly property int historyLimit: 30
+    readonly property int sampleIntervalMs: 2000
+    readonly property int readingTimeoutMs: 7000
 
     property bool cpuAvailable: false
     property var cpuHistory: []
@@ -18,14 +22,15 @@ Singleton {
     property bool cpuTemperatureAvailable: false
     property int cpuThreadCount: 0
     property real cpuUsage: 0
-    property bool cpuPowerAvailable: false
-    property real cpuPowerWatts: 0
+    readonly property bool cpuPowerAvailable: cpuPowerWatchdog.available && Number.isFinite(
+                                                  cpuPowerWatts)
+    property real cpuPowerWatts: NaN
     property real cpuClockMhz: NaN
     property var cpuPowerColumns: []
 
     function resetCpuPower() {
-        cpuPowerAvailable = false;
-        cpuPowerWatts = 0;
+        cpuPowerWatchdog.invalidate();
+        cpuPowerWatts = NaN;
         cpuClockMhz = NaN;
     }
 
@@ -38,14 +43,16 @@ Singleton {
             cpuPowerColumns = fields;
             return;
         }
-        const watts = parseGpuNumber(fields[cpuPowerColumns.indexOf("PkgWatt")]);
-        cpuPowerAvailable = Number.isFinite(watts);
-        cpuPowerWatts = cpuPowerAvailable ? watts : 0;
-        cpuClockMhz = parseGpuNumber(fields[cpuPowerColumns.indexOf("Bzy_MHz")]);
-        cpuPowerStaleTimer.restart();
+        const watts = parseMetricNumber(fields[cpuPowerColumns.indexOf("PkgWatt")]);
+        const clock = parseMetricNumber(fields[cpuPowerColumns.indexOf("Bzy_MHz")]);
+        if (!Number.isFinite(watts) && !Number.isFinite(clock))
+            return;
+        cpuPowerWatts = watts;
+        cpuClockMhz = clock;
+        cpuPowerWatchdog.markUpdated();
     }
 
-    property bool gpuAvailable: false
+    readonly property bool gpuAvailable: gpuWatchdog.available && Number.isFinite(gpuUsage)
     property real gpuClockMhz: NaN
     property var gpuHistory: []
     property real gpuMemoryTotalMib: NaN
@@ -55,7 +62,7 @@ Singleton {
     property string gpuName: ""
     property real gpuPowerWatts: NaN
     property real gpuTemperature: NaN
-    property real gpuUsage: 0
+    property real gpuUsage: NaN
 
     property bool memoryAvailable: false
     property var memoryHistory: []
@@ -65,8 +72,9 @@ Singleton {
     property real swapTotalBytes: 0
     property real swapUsedBytes: 0
 
-    property bool psuPowerAvailable: false
+    readonly property bool psuPowerAvailable: psuPowerWatchdog.available
     property real psuPowerWatts: 0
+    readonly property int psuPowerTimeoutMs: 15000
 
     property real previousCpuIdle: -1
     property real previousCpuTotal: -1
@@ -105,8 +113,8 @@ Singleton {
     }
 
     function invalidateGpu() {
-        gpuAvailable = false;
-        gpuUsage = 0;
+        gpuWatchdog.invalidate();
+        gpuUsage = NaN;
         gpuHistory = [];
         gpuClockMhz = NaN;
         gpuMemoryTotalMib = NaN;
@@ -115,7 +123,7 @@ Singleton {
         gpuTemperature = NaN;
     }
 
-    function parseGpuNumber(field) {
+    function parseMetricNumber(field) {
         if (!field)
             return NaN;
         const value = Number(field);
@@ -124,22 +132,22 @@ Singleton {
 
     function parseGpuLine(line) {
         const fields = line.split(",").map(field => field.trim());
-        if (fields.length < 7) {
-            invalidateGpu();
+        if (fields.length < 7)
             return;
-        }
 
-        const usage = parseGpuNumber(fields[1]);
+        const values = fields.slice(1, 7).map(field => parseMetricNumber(field));
+        if (!values.some(Number.isFinite))
+            return;
+        const usage = values[0];
         gpuName = fields[0];
-        gpuAvailable = Number.isFinite(usage);
-        gpuUsage = gpuAvailable ? Math.min(100, usage) : 0;
-        gpuMemoryUsedMib = parseGpuNumber(fields[2]);
-        gpuMemoryTotalMib = parseGpuNumber(fields[3]);
-        gpuTemperature = parseGpuNumber(fields[4]);
-        gpuPowerWatts = parseGpuNumber(fields[5]);
-        gpuClockMhz = parseGpuNumber(fields[6]);
-        gpuHistory = gpuAvailable ? appendSample(gpuHistory, gpuUsage) : [];
-        gpuStaleTimer.restart();
+        gpuUsage = Number.isFinite(usage) ? Math.min(100, usage) : NaN;
+        gpuMemoryUsedMib = values[1];
+        gpuMemoryTotalMib = values[2];
+        gpuTemperature = values[3];
+        gpuPowerWatts = values[4];
+        gpuClockMhz = values[5];
+        gpuHistory = Number.isFinite(usage) ? appendSample(gpuHistory, gpuUsage) : [];
+        gpuWatchdog.markUpdated();
     }
 
     function parseLoadAverage(contents) {
@@ -171,8 +179,6 @@ Singleton {
     }
 
     function parseSensors(contents) {
-        psuPowerAvailable = false;
-        psuPowerWatts = 0;
         try {
             const sensors = JSON.parse(contents);
             for (const deviceName of Object.keys(sensors)) {
@@ -181,7 +187,7 @@ Singleton {
                 const power = sensors[deviceName]?.["power total"]?.power1_input;
                 if (typeof power === "number" && Number.isFinite(power) && power >= 0) {
                     psuPowerWatts = power;
-                    psuPowerAvailable = true;
+                    psuPowerWatchdog.markUpdated();
                     break;
                 }
             }
@@ -224,7 +230,7 @@ Singleton {
     }
 
     Timer {
-        interval: 2000
+        interval: root.sampleIntervalMs
         repeat: true
         running: true
 
@@ -232,7 +238,7 @@ Singleton {
     }
 
     Timer {
-        interval: 2000
+        interval: root.sampleIntervalMs
         repeat: true
         running: true
 
@@ -242,6 +248,15 @@ Singleton {
         }
     }
 
+    ReadingWatchdog {
+        id: psuPowerWatchdog
+
+        // Keep the last successful reading through brief sensor failures.
+        // Only valid PSU samples extend its lifetime.
+        timeout: root.psuPowerTimeoutMs
+        onExpired: root.psuPowerWatts = 0
+    }
+
     Timer {
         id: gpuRestartTimer
 
@@ -249,12 +264,12 @@ Singleton {
         onTriggered: gpuMonitor.running = true
     }
 
-    Timer {
-        id: gpuStaleTimer
+    ReadingWatchdog {
+        id: gpuWatchdog
 
         // Allow several missed samples before hiding a stalled monitor's readings.
-        interval: 7000
-        onTriggered: root.invalidateGpu()
+        timeout: root.readingTimeoutMs
+        onExpired: root.invalidateGpu()
     }
 
     FileView {
@@ -287,11 +302,11 @@ Singleton {
         onLoaded: root.parseMemoryInfo(text())
     }
 
-    Timer {
-        id: cpuPowerStaleTimer
+    ReadingWatchdog {
+        id: cpuPowerWatchdog
 
-        interval: 7000
-        onTriggered: root.resetCpuPower()
+        timeout: root.readingTimeoutMs
+        onExpired: root.resetCpuPower()
     }
 
     Timer {
@@ -306,7 +321,7 @@ Singleton {
 
         // -n prevents authentication prompts from a background shell service.
         command: ["env", "LC_ALL=C", "sudo", "-n", "/usr/bin/turbostat", "--quiet", "--Summary",
-            "--show", "PkgWatt,Bzy_MHz", "--interval", "2"]
+            "--show", "PkgWatt,Bzy_MHz", "--interval", (root.sampleIntervalMs / 1000).toString()]
         running: true
 
         stdout: SplitParser {
@@ -317,7 +332,6 @@ Singleton {
 
         onExited: {
             root.cpuPowerColumns = [];
-            cpuPowerStaleTimer.stop();
             root.resetCpuPower();
             cpuPowerRestartTimer.restart();
         }
@@ -340,7 +354,7 @@ Singleton {
 
         command: ["nvidia-smi",
             "--query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw,clocks.current.graphics",
-            "--format=csv,noheader,nounits", "--loop-ms=2000"]
+            "--format=csv,noheader,nounits", "--loop-ms=" + root.sampleIntervalMs]
         running: true
 
         stdout: SplitParser {
@@ -353,7 +367,6 @@ Singleton {
             if (running) {
                 startedOnce = true;
             } else if (startedOnce) {
-                gpuStaleTimer.stop();
                 root.invalidateGpu();
                 if (!gpuRestartTimer.running)
                     gpuRestartTimer.restart();
