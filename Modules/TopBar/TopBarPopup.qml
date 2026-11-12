@@ -15,6 +15,7 @@ PanelWindow {
 
     property var anchorItem: null
     property point anchorPosition: Qt.point(0, 0)
+    property bool centerOnAnchor: false
     property alias content: contentLoader.sourceComponent
     readonly property int maximumPopupHeight: Math.max(240, Math.min(configuredMaximumHeight, (
                                                                          targetScreen?.height
@@ -23,15 +24,15 @@ PanelWindow {
     property int configuredMaximumHeight: 520
     readonly property int popupHeight: Math.min(maximumPopupHeight, contentLoader.implicitHeight
                                                 + 2 * Theme.spacingL)
-    readonly property int popupRightMargin: Math.max(Theme.spacingXS, Math.min((targetScreen?.width
-                                                                                ?? popupWidth)
-                                                                               - popupWidth
-                                                                               - Theme.spacingXS, (
-                                                                                   targetScreen
-                                                                                   ?.width ?? 0)
-                                                                               - anchorPosition.x - (
-                                                                                   anchorItem
-                                                                                   ?.width ?? 0)))
+    readonly property int popupRightMargin: {
+        const screenWidth = targetScreen?.width ?? popupWidth;
+        const anchorWidth = anchorItem?.width ?? 0;
+        const alignmentOffset = centerOnAnchor ? (anchorWidth - popupWidth) / 2 : 0;
+        const margin = screenWidth - anchorPosition.x - anchorWidth + alignmentOffset;
+        return Math.max(Theme.spacingXS, Math.min(screenWidth - popupWidth - Theme.spacingXS,
+                                                  margin));
+
+    }
     readonly property int popupTopMargin: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
     property int popupWidth: 340
     property bool relocating: false

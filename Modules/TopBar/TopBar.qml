@@ -12,6 +12,8 @@ Variants {
 
     property bool bluetoothPopupOpen: false
     property var bluetoothPopupScreen: null
+    property bool calendarPopupOpen: false
+    property var calendarPopupScreen: null
     property bool controlCenterOpen: false
     property var controlCenterScreen: null
     property bool gamingPopupOpen: false
@@ -28,6 +30,7 @@ Variants {
     property real backgroundTransparency: SettingsData.topBarTransparency
 
     signal bluetoothPopupRequested(var anchorItem, var screen)
+    signal calendarPopupRequested(var anchorItem, var screen)
     signal controlCenterRequested(var screen)
     signal gamingPopupRequested(var anchorItem, var screen)
     signal launcherRequested(var screen)
@@ -160,27 +163,24 @@ Variants {
                 }
             }
 
-            Rectangle {
-                anchors.centerIn: parent
-                color: Theme.widgetBackground
-                height: Theme.topBarWidgetHeight
-                radius: Theme.cornerRadius
-                width: dateLabel.implicitWidth + 2 * Theme.spacingM
+            TopBarButton {
+                id: dateButton
 
-                StyledText {
+                accessibleName: "Calendar"
+                active: root.calendarPopupOpen && root.calendarPopupScreen === barWindow.modelData
+                anchors.centerIn: parent
+                buttonWidth: dateLabel.implicitWidth + 2 * Theme.spacingM
+
+                contentItem: StyledText {
                     id: dateLabel
 
-                    anchors.centerIn: parent
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeMedium
-                    // font.weight: Font.Bold
                     text: root.formatDate(systemClock.date)
+                    wrapMode: Text.NoWrap
                 }
 
-                StateLayer {
-                    anchors.fill: parent
-                    cornerRadius: parent.radius
-                    stateColor: Theme.primary
-                }
+                onClicked: root.calendarPopupRequested(dateButton, barWindow.modelData)
             }
         }
     }

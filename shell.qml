@@ -14,6 +14,8 @@ ShellRoot {
     function activateExclusiveSurface(activeSurface) {
         if (activeSurface !== bluetoothPopup)
             bluetoothPopup.close();
+        if (activeSurface !== calendarPopup)
+            calendarPopup.close();
         if (activeSurface !== controlCenter)
             controlCenter.closeControlCenter();
         if (activeSurface !== gamingPopup)
@@ -35,6 +37,8 @@ ShellRoot {
     TopBar {
         bluetoothPopupOpen: bluetoothPopup.visible
         bluetoothPopupScreen: bluetoothPopup.targetScreen
+        calendarPopupOpen: calendarPopup.visible
+        calendarPopupScreen: calendarPopup.targetScreen
         controlCenterOpen: controlCenter.isOpen
         controlCenterScreen: controlCenter.targetScreen
         gamingPopupOpen: gamingPopup.visible
@@ -51,6 +55,9 @@ ShellRoot {
 
         onBluetoothPopupRequested: (anchorItem, screen) => {
             bluetoothPopup.toggle(anchorItem, screen);
+        }
+        onCalendarPopupRequested: (anchorItem, screen) => {
+            calendarPopup.toggle(anchorItem, screen);
         }
         onControlCenterRequested: screen => {
             systemTrayPopup.close();
@@ -82,6 +89,15 @@ ShellRoot {
         onVisibleChanged: {
             if (bluetoothPopup.visible)
                 root.activateExclusiveSurface(bluetoothPopup);
+        }
+    }
+
+    CalendarPopup {
+        id: calendarPopup
+
+        onVisibleChanged: {
+            if (calendarPopup.visible)
+                root.activateExclusiveSurface(calendarPopup);
         }
     }
 
