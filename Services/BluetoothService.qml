@@ -15,6 +15,7 @@ Singleton {
     readonly property bool available: adapter !== null
     property var connectedAddresses: []
     property bool connectionStateLoaded: false
+    property int connectionGeneration: 0
     readonly property bool enabled: adapter?.enabled === true || adapter?.state
                                     === BluetoothAdapterState.Enabled || adapter?.state
                                     === BluetoothAdapterState.Enabling
@@ -41,6 +42,8 @@ Singleton {
     }
 
     function isDeviceConnected(device) {
+        if (!enabled)
+            return false;
         if (!connectionStateLoaded)
             return device?.connected ?? false;
 
@@ -60,8 +63,50 @@ Singleton {
             return;
         }
 
-        connectedDevicesQuery.parsedAddresses = [];
+        connectedDevicesQuery.queryAdapterPath = adapter?.dbusPath ?? "";
+        connectedDevicesQuery.queryGeneration = connectionGeneration;
+        connectedDevicesQuery.parsedAddresses = null;
         connectedDevicesQuery.running = true;
+    }
+
+    function resetConnectionState() {
+        connectionGeneration++;
+        connectedAddresses = [];
+        connectionStateLoaded = false;
+        refreshConnectionState();
+    }
+
+    // Read typed BlueZ properties, not bluetoothctl's colorized display output.
+    // null means an invalid snapshot; an empty array means no connected devices.
+    function parseConnectedAddresses(text, adapterPath) {
+        try {
+            const response = JSON.parse(text);
+            if (response.type !== "a{oa{sa{sv}}}" || !Array.isArray(response.data)
+                    || response.data.length !== 1)
+                return null;
+
+            const objects = response.data[0];
+            const adapterProperties = objects?.[adapterPath]?.["org.bluez.Adapter1"];
+            if (typeof adapterProperties?.Powered?.data !== "boolean")
+                return null;
+            if (!adapterProperties.Powered.data)
+                return [];
+
+            const addresses = [];
+            for (const interfaces of Object.values(objects)) {
+                const device = interfaces["org.bluez.Device1"];
+                if (!device || device.Adapter?.data !== adapterPath)
+                    continue;
+                if (typeof device.Connected?.data !== "boolean" || typeof device.Address?.data
+                        !== "string")
+                    return null;
+                if (device.Connected.data)
+                    addresses.push(device.Address.data.toUpperCase());
+            }
+            return addresses;
+        } catch (error) {
+            return null;
+        }
     }
 
     function deviceIcon(device) {
@@ -142,7 +187,8 @@ Singleton {
 
     Component.onCompleted: refreshConnectionState()
 
-    onEnabledChanged: refreshConnectionState()
+    onAdapterChanged: resetConnectionState()
+    onEnabledChanged: resetConnectionState()
 
     Timer {
         id: connectionRefreshTimer
@@ -162,27 +208,26 @@ Singleton {
     Process {
         id: connectedDevicesQuery
 
-        property var parsedAddresses: []
+        property var parsedAddresses: null
+        property string queryAdapterPath: ""
+        property int queryGeneration: 0
         property bool refreshPending: false
 
-        command: ["bluetoothctl", "devices", "Connected"]
+        command: ["busctl", "--system", "--timeout=3", "--json=short", "call", "org.bluez", "/",
+            "org.freedesktop.DBus.ObjectManager", "GetManagedObjects"]
         running: false
 
         stdout: StdioCollector {
             onStreamFinished: {
-                const addresses = [];
-                for (const line of text.trim().split("\n")) {
-                    const match = line.match(/^Device\s+([0-9A-Fa-f:]{17})(?:\s|$)/);
-                    if (match)
-                        addresses.push(match[1].toUpperCase());
-                }
-                connectedDevicesQuery.parsedAddresses = addresses;
+                connectedDevicesQuery.parsedAddresses = root.parseConnectedAddresses(text,
+                                                                                     connectedDevicesQuery.queryAdapterPath);
             }
         }
 
         // qmllint disable signal-handler-parameters
         onExited: exitCode => {
-            if (exitCode === 0) {
+            if (exitCode === 0 && parsedAddresses !== null && root.enabled && queryGeneration
+                    === root.connectionGeneration && queryAdapterPath === root.adapter?.dbusPath) {
                 root.connectedAddresses = parsedAddresses;
                 root.connectionStateLoaded = true;
             }
