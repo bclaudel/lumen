@@ -14,6 +14,7 @@ Rectangle {
     required property string iconName
     required property string title
     required property real usage
+    property string extraDetail: ""
     property color accent: Theme.primary
     property string subtitle: ""
     property string leftDetail: ""
@@ -27,16 +28,20 @@ Rectangle {
     border.color: Theme.withAlpha(accent, 0.16)
     border.width: 1
     color: Theme.surfaceContainerHigh
-    implicitHeight: 286
+    implicitHeight: 310
     radius: Theme.cornerRadius
 
-    ColumnLayout {
+    Item {
         anchors.fill: parent
         anchors.margins: Theme.spacingL
-        spacing: Theme.spacingM
 
         RowLayout {
-            Layout.fillWidth: true
+            id: heading
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 44
             spacing: Theme.spacingS
 
             MaterialIcon {
@@ -77,50 +82,60 @@ Rectangle {
             }
         }
 
-        GridLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            columns: 1
-            columnSpacing: Theme.spacingL
-            rowSpacing: Theme.spacingS
+        UsageGauge {
+            id: gauge
 
-            UsageGauge {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 112
-                Layout.preferredHeight: 112
-                accent: root.metricColor
-                available: root.available
-                caption: "Usage"
-                value: root.usage
-            }
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: heading.bottom
+            anchors.topMargin: Theme.spacingS
+            width: 112
+            height: 112
+            accent: root.metricColor
+            available: root.available
+            caption: "Usage"
+            value: root.usage
+        }
 
-            ColumnLayout {
+        ColumnLayout {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: gauge.bottom
+            anchors.topMargin: Theme.spacingS
+            spacing: Theme.spacingXS
+
+            StyledText {
                 Layout.fillWidth: true
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    Layout.fillWidth: true
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: root.leftDetail
-                    wrapMode: Text.NoWrap
-                }
-
-                StyledText {
-                    Layout.fillWidth: true
-                    color: Theme.surfaceTextMedium
-                    font.pixelSize: Theme.fontSizeSmall
-                    text: root.rightDetail
-                    wrapMode: Text.NoWrap
-                }
-
-                PerformanceHistoryGraph {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 32
-                    graphColor: root.accent
-                    values: root.history
-                    visible: root.available
-                }
+                font.pixelSize: Theme.fontSizeSmall
+                text: root.leftDetail
+                wrapMode: Text.NoWrap
             }
+
+            StyledText {
+                Layout.fillWidth: true
+                color: Theme.surfaceTextMedium
+                font.pixelSize: Theme.fontSizeSmall
+                text: root.rightDetail
+                wrapMode: Text.NoWrap
+            }
+
+            StyledText {
+                Layout.fillWidth: true
+                color: Theme.surfaceTextMedium
+                font.pixelSize: Theme.fontSizeSmall
+                text: root.extraDetail
+                visible: text !== ""
+                wrapMode: Text.NoWrap
+            }
+        }
+
+        PerformanceHistoryGraph {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 32
+            graphColor: root.accent
+            values: root.history
+            visible: root.available
         }
     }
 }

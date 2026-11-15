@@ -13,6 +13,8 @@ TopBarPopup {
     popupWidth: Math.min(830, (targetScreen?.width ?? 862) - 2 * Theme.spacingL)
     configuredMaximumHeight: 620
 
+    onVisibleChanged: PinwatchService.monitoring = visible
+
     function formatGib(bytes) {
         return `${(bytes / 1073741824).toFixed(1)} GiB`;
     }
@@ -29,6 +31,13 @@ TopBarPopup {
         if (Number.isFinite(SystemPerformanceService.gpuClockMhz))
             details.push(Math.round(SystemPerformanceService.gpuClockMhz) + " MHz");
         return details.join(" · ");
+    }
+
+    function formatPinCurrents() {
+        if (!PinwatchService.fresh)
+            return "—";
+        return PinwatchService.channels.map(channel => channel.current_a.toFixed(2)).join("/")
+                + " A";
     }
 
     function formatCpuPowerAndClock() {
@@ -109,6 +118,7 @@ TopBarPopup {
                     leftDetail: SystemPerformanceService.gpuMemoryAvailable ? root.formatGpuMemory(
                                                                                   ) : ""
                     rightDetail: root.formatGpuPowerAndClock()
+                    extraDetail: root.formatPinCurrents()
                     temperatureText: Number.isFinite(SystemPerformanceService.gpuTemperature)
                                      ? root.formatTemperature(
                                            SystemPerformanceService.gpuTemperature) : ""
