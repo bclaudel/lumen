@@ -41,10 +41,9 @@ PanelWindow {
                                                                       * Theme.spacingXS) : Math.min(
                                                                  300, width - 2 * Theme.spacingXS)
     readonly property real popupX: {
-        const preferredX = anchorPosition.x + (anchorItem?.width ?? 0) - popupWidth;
-        return Math.max(Theme.spacingXS, Math.min(width - popupWidth - Theme.spacingXS,
-                                                  preferredX));
-
+        const preferredX = anchorPosition.x + ((anchorItem?.width ?? 0) - popupWidth) / 2;
+        const sideMargin = SettingsData.hyprlandGapsOut;
+        return Math.max(sideMargin, Math.min(width - popupWidth - sideMargin, preferredX));
     }
 
     function close() {

@@ -17,8 +17,6 @@ TopBarPopup {
                                                     ) && displayedMonth.getMonth()
                                                 === today.getMonth()
 
-    centerOnAnchor: true
-
     function showToday() {
         displayedMonth = new Date(today.getFullYear(), today.getMonth(), 1, 12);
     }

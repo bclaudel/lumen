@@ -15,7 +15,6 @@ PanelWindow {
 
     property var anchorItem: null
     property point anchorPosition: Qt.point(0, 0)
-    property bool centerOnAnchor: false
     property alias content: contentLoader.sourceComponent
     readonly property int maximumPopupHeight: Math.max(240, Math.min(configuredMaximumHeight, (
                                                                          targetScreen?.height
@@ -27,10 +26,10 @@ PanelWindow {
     readonly property int popupRightMargin: {
         const screenWidth = targetScreen?.width ?? popupWidth;
         const anchorWidth = anchorItem?.width ?? 0;
-        const alignmentOffset = centerOnAnchor ? (anchorWidth - popupWidth) / 2 : 0;
-        const margin = screenWidth - anchorPosition.x - anchorWidth + alignmentOffset;
-        return Math.max(Theme.spacingXS, Math.min(screenWidth - popupWidth - Theme.spacingXS,
-                                                  margin));
+        const centeredMargin = screenWidth - anchorPosition.x - anchorWidth / 2 - popupWidth / 2;
+        const sideMargin = SettingsData.hyprlandGapsOut;
+        return Math.max(sideMargin, Math.min(screenWidth - popupWidth - sideMargin,
+                                             centeredMargin));
 
     }
     readonly property int popupTopMargin: Theme.topBarSurfaceOffset + SettingsData.hyprlandGapsOut
