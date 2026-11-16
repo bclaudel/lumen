@@ -195,7 +195,7 @@ Variants {
                              === barWindow.modelData) || (root.osdActive && root.osdScreen
                                                           === barWindow.modelData)
                     iconName: root.osdActive && root.osdScreen === barWindow.modelData
-                              ? root.osdIcon : "menu"
+                              ? root.osdIcon : "tune"
                     screen: barWindow.modelData
 
                     onClicked: {
