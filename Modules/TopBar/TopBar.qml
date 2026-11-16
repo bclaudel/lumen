@@ -20,6 +20,8 @@ Variants {
     property var gamingPopupScreen: null
     property bool launcherOpen: false
     property var launcherScreen: null
+    property bool notificationCenterOpen: false
+    property var notificationCenterScreen: null
     property bool osdActive: false
     property string osdIcon: ""
     property var osdScreen: null
@@ -34,6 +36,7 @@ Variants {
     signal controlCenterRequested(var screen)
     signal gamingPopupRequested(var anchorItem, var screen)
     signal launcherRequested(var screen)
+    signal notificationCenterRequested(var anchorItem, var screen)
     signal performancePopupRequested(var anchorItem, var screen)
     signal trayMenuRequested(var trayItem, var anchorItem, var screen)
     signal trayOverflowRequested(var anchorItem, var screen)
@@ -147,6 +150,44 @@ Variants {
                             === barWindow.modelData
 
                     onClicked: root.bluetoothPopupRequested(bluetoothButton, barWindow.modelData)
+                }
+
+                TopBarButton {
+                    id: notificationButton
+
+                    accessibleName: "Notifications"
+                    active: root.notificationCenterOpen && root.notificationCenterScreen
+                            === barWindow.modelData
+
+                    contentItem: Item {
+                        MaterialIcon {
+                            anchors.centerIn: parent
+                            name: "notifications"
+                            size: Theme.topBarIconSize
+                        }
+
+                        Rectangle {
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            color: Theme.primary
+                            height: 13
+                            radius: height / 2
+                            visible: NotificationService.unreadCount > 0
+                            width: Math.max(13, countLabel.implicitWidth + 6)
+
+                            StyledText {
+                                id: countLabel
+                                anchors.centerIn: parent
+                                color: Theme.primaryText
+                                font.pixelSize: 9
+                                text: NotificationService.unreadCount > 99 ? "99+" :
+                                                                             NotificationService.unreadCount
+                            }
+                        }
+                    }
+
+                    onClicked: root.notificationCenterRequested(notificationButton,
+                                                                barWindow.modelData)
                 }
 
                 ControlCenterButton {

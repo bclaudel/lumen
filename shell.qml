@@ -22,6 +22,8 @@ ShellRoot {
             gamingPopup.close();
         if (activeSurface !== launcher)
             launcher.hide();
+        if (activeSurface !== notificationCenter)
+            notificationCenter.close();
         if (activeSurface !== performancePopup)
             performancePopup.close();
         if (activeSurface !== session)
@@ -45,6 +47,8 @@ ShellRoot {
         gamingPopupScreen: gamingPopup.targetScreen
         launcherOpen: launcher.visible
         launcherScreen: launcher.targetScreen
+        notificationCenterOpen: notificationCenter.visible
+        notificationCenterScreen: notificationCenter.targetScreen
         osdActive: onScreenDisplay.popupActive
         osdIcon: onScreenDisplay.indicatorIcon
         osdScreen: onScreenDisplay.targetScreen
@@ -67,6 +71,9 @@ ShellRoot {
             gamingPopup.toggle(anchorItem, screen);
         }
         onLauncherRequested: screen => launcher.toggle(screen)
+        onNotificationCenterRequested: (anchorItem, screen) => {
+            notificationCenter.toggle(anchorItem, screen);
+        }
         onPerformancePopupRequested: (anchorItem, screen) => {
             performancePopup.toggle(anchorItem, screen);
         }
@@ -131,6 +138,22 @@ ShellRoot {
         id: onScreenDisplay
 
         suppressed: controlCenter.isOpen
+    }
+
+    NotificationCenter {
+        id: notificationCenter
+
+        onVisibleChanged: {
+            if (notificationCenter.visible)
+                root.activateExclusiveSurface(notificationCenter);
+        }
+    }
+
+    NotificationToasts {
+        suppressed: bluetoothPopup.visible || calendarPopup.visible || controlCenter.isOpen
+                    || gamingPopup.visible || launcher.visible || notificationCenter.visible
+                    || performancePopup.visible || session.isOpen || systemTrayPopup.visible
+                    || wifiPopup.visible || onScreenDisplay.popupActive
     }
 
     SystemPerformancePopup {
