@@ -9,11 +9,13 @@ Canvas {
 
     property color graphColor: Theme.primary
     property int sampleCapacity: 30
+    property real valueMaximum: 100
     property var values: []
 
     implicitHeight: 44
 
     onGraphColorChanged: requestPaint()
+    onValueMaximumChanged: requestPaint()
     onValuesChanged: requestPaint()
 
     onPaint: {
@@ -35,7 +37,8 @@ Canvas {
 
         const step = width / Math.max(1, sampleCapacity - 1);
         const startX = width - step * (values.length - 1);
-        const pointY = value => height - Math.max(0, Math.min(100, value)) * height / 100;
+        const pointY = value => height - Math.max(0, Math.min(valueMaximum, value)) * height
+                                / valueMaximum;
 
         context.beginPath();
         context.moveTo(startX, height);

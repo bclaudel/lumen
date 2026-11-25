@@ -9,6 +9,7 @@ Singleton {
     id: root
 
     property string activeConnectionUuid: ""
+    property string activeDevice: ""
     property var accessPoints: []
     property string connectionError: ""
     property string connectingSsid: ""
@@ -112,8 +113,8 @@ Singleton {
     }
 
     function applyNetworkStatus(contents) {
-        let hasEthernet = false;
-        let hasWifi = false;
+        let ethernetDevice = "";
+        let connectedWifiDevice = "";
         let detectedWifiDevice = "";
 
         for (const line of contents.trim().split("\n")) {
@@ -130,16 +131,17 @@ Singleton {
             if (!state.startsWith("connected"))
                 continue;
             if (type === "ethernet")
-                hasEthernet = true;
+                ethernetDevice = device;
             else if (type === "wifi")
-                hasWifi = true;
+                connectedWifiDevice = device;
         }
 
         wifiDevice = detectedWifiDevice;
-        if (hasEthernet) {
+        activeDevice = ethernetDevice || connectedWifiDevice;
+        if (ethernetDevice) {
             networkStatus = "ethernet";
             wifiSignalStrengthStr = "excellent";
-        } else if (hasWifi) {
+        } else if (connectedWifiDevice) {
             networkStatus = "wifi";
             if (!networkSelectionActive)
                 networkRefreshTimer.restart();
@@ -426,6 +428,7 @@ Singleton {
             if (exitCode === 0) {
                 root.applyNetworkStatus(capturedOutput);
             } else {
+                root.activeDevice = "";
                 root.networkStatus = "disconnected";
                 root.wifiSignalStrengthStr = "excellent";
                 root.wifiSsid = "";

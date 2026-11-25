@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -71,6 +72,18 @@ Singleton {
     property real memoryUsedBytes: 0
     property real swapTotalBytes: 0
     property real swapUsedBytes: 0
+
+    property bool networkAvailable: false
+    property string networkDevice: ""
+    property real downloadBytesPerSecond: 0
+    property real uploadBytesPerSecond: 0
+    property real receivedBytes: 0
+    property real transmittedBytes: 0
+    property var downloadHistory: []
+    property var uploadHistory: []
+    property real previousReceivedBytes: -1
+    property real previousTransmittedBytes: -1
+    property real previousNetworkSampleAt: 0
 
     readonly property bool psuPowerAvailable: psuPowerWatchdog.available
     property real psuPowerWatts: 0
@@ -178,6 +191,68 @@ Singleton {
         memoryAvailable = true;
     }
 
+    function resetNetwork() {
+        networkWatchdog.invalidate();
+        networkAvailable = false;
+        networkDevice = "";
+        downloadBytesPerSecond = 0;
+        uploadBytesPerSecond = 0;
+        receivedBytes = 0;
+        transmittedBytes = 0;
+        downloadHistory = [];
+        uploadHistory = [];
+        previousReceivedBytes = -1;
+        previousTransmittedBytes = -1;
+        previousNetworkSampleAt = 0;
+    }
+
+    function parseNetworkStatistics(contents) {
+        const device = NetworkService.activeDevice;
+        const line = contents.split("\n").find(entry => entry.trim().startsWith(device + ":"));
+        if (!device || !line) {
+            resetNetwork();
+            return;
+        }
+
+        const fields = line.split(":")[1].trim().split(/\s+/);
+        const received = Number(fields[0]);
+        const transmitted = Number(fields[8]);
+        if (fields.length < 16 || !Number.isFinite(received) || !Number.isFinite(transmitted)) {
+            resetNetwork();
+            return;
+        }
+
+        const now = Date.now();
+        receivedBytes = received;
+        transmittedBytes = transmitted;
+        networkWatchdog.markUpdated();
+
+        if (device !== networkDevice || received < previousReceivedBytes || transmitted
+                < previousTransmittedBytes) {
+            networkDevice = device;
+            networkAvailable = false;
+            downloadBytesPerSecond = 0;
+            uploadBytesPerSecond = 0;
+            downloadHistory = [];
+            uploadHistory = [];
+        } else if (previousNetworkSampleAt > 0) {
+            const elapsedSeconds = (now - previousNetworkSampleAt) / 1000;
+            if (elapsedSeconds > 0) {
+                downloadBytesPerSecond = Math.max(0, (received - previousReceivedBytes)
+                                                  / elapsedSeconds);
+                uploadBytesPerSecond = Math.max(0, (transmitted - previousTransmittedBytes)
+                                                / elapsedSeconds);
+                downloadHistory = appendSample(downloadHistory, downloadBytesPerSecond);
+                uploadHistory = appendSample(uploadHistory, uploadBytesPerSecond);
+                networkAvailable = true;
+            }
+        }
+
+        previousReceivedBytes = received;
+        previousTransmittedBytes = transmitted;
+        previousNetworkSampleAt = now;
+    }
+
     function parseSensors(contents) {
         try {
             const sensors = JSON.parse(contents);
@@ -222,6 +297,7 @@ Singleton {
         cpuStatFile.reload();
         loadAverageFile.reload();
         memoryInfoFile.reload();
+        networkStatisticsFile.reload();
     }
 
     Component.onCompleted: {
@@ -300,6 +376,23 @@ Singleton {
         printErrors: false
 
         onLoaded: root.parseMemoryInfo(text())
+    }
+
+    FileView {
+        id: networkStatisticsFile
+
+        blockLoading: true
+        path: "/proc/net/dev"
+        printErrors: false
+
+        onLoaded: root.parseNetworkStatistics(text())
+    }
+
+    ReadingWatchdog {
+        id: networkWatchdog
+
+        timeout: root.readingTimeoutMs
+        onExpired: root.resetNetwork()
     }
 
     ReadingWatchdog {

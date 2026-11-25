@@ -10,8 +10,8 @@ import qs.Widgets
 TopBarPopup {
     id: root
 
-    popupWidth: Math.min(830, (targetScreen?.width ?? 862) - 2 * Theme.spacingL)
-    configuredMaximumHeight: 620
+    popupWidth: Math.min(600, (targetScreen?.width ?? 862) - 2 * Theme.spacingL)
+    configuredMaximumHeight: 760
 
     onVisibleChanged: PinwatchService.monitoring = visible
 
@@ -89,7 +89,7 @@ TopBarPopup {
 
             GridLayout {
                 Layout.fillWidth: true
-                columns: 3
+                columns: 2
                 columnSpacing: Theme.spacingM
                 rowSpacing: Theme.spacingM
                 PerformanceMetricCard {
@@ -141,6 +141,11 @@ TopBarPopup {
                                                                                   }%` : ""
                     title: "Memory"
                     usage: SystemPerformanceService.memoryUsage
+                }
+
+                NetworkPerformanceCard {
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
                 }
             }
         }
