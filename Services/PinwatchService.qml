@@ -83,7 +83,7 @@ Singleton {
     Process {
         id: stream
 
-        command: ["/usr/local/bin/pinwatch", "watch", "--json"]
+        command: ["pinwatch", "watch", "--json"]
 
         stdout: SplitParser {
             splitMarker: "\n"
