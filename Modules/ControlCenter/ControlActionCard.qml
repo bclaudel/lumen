@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
@@ -10,6 +12,7 @@ Controls.AbstractButton {
 
     property bool active: false
     property bool available: true
+    property bool highlightIcon: available
     property string iconName: ""
     property string subtitle: ""
     property string title: ""
@@ -43,14 +46,14 @@ Controls.AbstractButton {
 
         Rectangle {
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredHeight: 46
-            Layout.preferredWidth: 46
-            color: root.available ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
+            Layout.preferredHeight: Theme.controlCenterButtonSize
+            Layout.preferredWidth: Theme.controlCenterButtonSize
+            color: root.highlightIcon ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
             radius: width / 2
 
             MaterialIcon {
                 anchors.centerIn: parent
-                color: root.available ? Theme.primaryText : Theme.surfaceText
+                color: root.highlightIcon ? Theme.primaryText : Theme.surfaceText
                 name: root.iconName
                 size: Theme.iconSize
             }

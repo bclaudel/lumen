@@ -59,7 +59,7 @@ ControlCenterSurface {
                 enabled: root.actionEnabled
                 iconColor: Theme.surfaceText
                 iconName: root.actionIconName
-                iconSize: Theme.iconSizeSmall
+                iconSize: Theme.iconSize
                 visible: root.actionVisible
 
                 onClicked: root.actionRequested()
@@ -100,7 +100,7 @@ ControlCenterSurface {
                     anchors.verticalCenter: parent.verticalCenter
                     color: slider.visualPosition > 0.1 ? Theme.primaryText : Theme.surfaceText
                     name: root.iconName
-                    size: Theme.iconSizeSmall
+                    size: Theme.iconSize
                 }
             }
 

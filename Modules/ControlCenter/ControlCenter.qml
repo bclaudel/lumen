@@ -83,7 +83,6 @@ PanelWindow {
         BrightnessService.setTargetScreen(resolvedScreen);
         NetworkService.refreshNetworkState();
         BluetoothService.refreshConnectionState();
-        SleepInhibitService.refresh();
 
         if (screenChanged) {
             Qt.callLater(() => {
@@ -294,17 +293,11 @@ PanelWindow {
                         Layout.fillWidth: true
                         spacing: Theme.spacingM
 
-                        SleepInhibitCard {
-                            Layout.fillWidth: true
-                            Layout.preferredWidth: 1
-                        }
-
                         ControlCard {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
                             Layout.preferredWidth: 1
                             actionAccessibleName: "Take screenshot (" + subtitle + ")"
-                            actionButtonSize: 42
                             active: root.screenshotOptionsOpen
                             available: !screenshotDelay.running && !screenshotCapture.running
                             expanded: root.screenshotOptionsOpen
@@ -319,6 +312,38 @@ PanelWindow {
                                 root.screenshotOptionsOpen = !root.screenshotOptionsOpen;
                             }
                             onToggleRequested: root.takeScreenshot()
+                        }
+
+                        ControlActionCard {
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            active: ScreenRecordingService.recording
+                            available: ScreenRecordingService.available
+                            enabled: available && !ScreenRecordingService.stopping && (
+                                         !ScreenRecordingService.active
+                                         || ScreenRecordingService.recording)
+                            highlightIcon: active
+                            iconName: ScreenRecordingService.recording ? "stop_circle" : "videocam"
+                            implicitHeight: 68
+                            subtitle: {
+                                if (ScreenRecordingService.stopping)
+                                    return "Saving…";
+                                if (ScreenRecordingService.recording)
+                                    return "Stop recording";
+                                return ScreenRecordingService.active ? "Starting…" :
+                                                                       "Start recording";
+                            }
+                            title: "Record Screen"
+
+                            onClicked: {
+                                root.closeControlCenter();
+                                if (ScreenRecordingService.recording)
+                                    ScreenRecordingService.stop();
+                                else
+                                    ScreenRecordingService.start(root.targetScreen?.name ?? "",
+                                                                 root.transitionDuration);
+                            }
                         }
                     }
 
@@ -369,7 +394,7 @@ PanelWindow {
 
                                         MaterialIcon {
                                             name: modeButton.modelData.icon
-                                            size: Theme.iconSizeSmall
+                                            size: Theme.iconSize
                                         }
 
                                         StyledText {

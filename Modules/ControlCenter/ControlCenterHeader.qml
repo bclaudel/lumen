@@ -47,8 +47,8 @@ ControlCenterSurface {
     implicitHeight: 58
 
     component HeaderButton: IconButton {
-        buttonSize: 36
-        iconSize: 20
+        buttonSize: Theme.controlCenterButtonSize
+        iconSize: Theme.iconSize
         tooltipText: accessibleName
     }
 
@@ -59,27 +59,28 @@ ControlCenterSurface {
         spacing: Theme.spacingS
 
         Rectangle {
-            Layout.preferredHeight: 46
-            Layout.preferredWidth: 46
+            Layout.preferredHeight: Theme.controlCenterButtonSize
+            Layout.preferredWidth: Theme.controlCenterButtonSize
             color: Theme.archBlue
             radius: height / 2
 
             IconImage {
                 id: archIcon
 
-                anchors.fill: parent
-                anchors.margins: 6
+                anchors.centerIn: parent
                 asynchronous: true
+                height: Theme.iconSize
                 smooth: true
                 source: Qt.resolvedUrl("../../Assets/archlinux.svg")
                 visible: status === Image.Ready
+                width: Theme.iconSize
             }
 
             MaterialIcon {
                 anchors.centerIn: parent
                 color: Theme.primaryText
                 name: "terminal"
-                size: 20
+                size: Theme.iconSize
                 visible: !archIcon.visible
             }
         }

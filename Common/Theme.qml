@@ -15,6 +15,7 @@ Singleton {
     property color buttonActiveBackground: secondary
     property color buttonBackground: surfaceVariant
     property color contentBackground: withAlpha(surfaceVariant, 0.1)
+    property real controlCenterButtonSize: 42
     property real cornerRadius: 12
     property color descriptionBackground: withAlpha(surfaceVariant, 0.5)
     property color error: "#F2B8B5"

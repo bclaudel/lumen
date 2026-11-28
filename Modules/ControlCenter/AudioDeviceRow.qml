@@ -58,7 +58,7 @@ Item {
             Layout.preferredHeight: inputCard.implicitHeight
             spacing: Theme.spacingM
 
-            AudioDeviceCard {
+            ControlActionCard {
                 id: inputCard
 
                 Layout.fillHeight: true
@@ -76,7 +76,7 @@ Item {
                 onClicked: root.selectionRequested(true)
             }
 
-            AudioDeviceCard {
+            ControlActionCard {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1

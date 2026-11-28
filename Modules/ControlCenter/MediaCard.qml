@@ -43,7 +43,7 @@ ControlCenterSurface {
                     anchors.centerIn: parent
                     color: Theme.surfaceTextMedium
                     name: "music_note"
-                    size: Theme.iconSizeLarge
+                    size: Theme.iconSize
                     visible: MediaService.artworkUrl === "" || artwork.status !== Image.Ready
                 }
             }
@@ -77,10 +77,11 @@ ControlCenterSurface {
             spacing: Theme.spacingS
 
             IconButton {
-                buttonSize: 34
+                buttonSize: Theme.controlCenterButtonSize
                 enabled: MediaService.canGoPrevious
                 iconColor: Theme.surfaceText
                 iconName: "skip_previous"
+                iconSize: Theme.iconSize
                 opacity: enabled ? Theme.opacityFull : Theme.opacityDisabled
 
                 onClicked: MediaService.previous()
@@ -88,7 +89,7 @@ ControlCenterSurface {
 
             IconButton {
                 backgroundColor: Theme.withAlpha(Theme.surfaceText, 0.12)
-                buttonSize: 42
+                buttonSize: Theme.controlCenterButtonSize
                 enabled: MediaService.canTogglePlaying
                 iconColor: Theme.surfaceText
                 iconName: MediaService.playing ? "pause" : "play_arrow"
@@ -99,10 +100,11 @@ ControlCenterSurface {
             }
 
             IconButton {
-                buttonSize: 34
+                buttonSize: Theme.controlCenterButtonSize
                 enabled: MediaService.canGoNext
                 iconColor: Theme.surfaceText
                 iconName: "skip_next"
+                iconSize: Theme.iconSize
                 opacity: enabled ? Theme.opacityFull : Theme.opacityDisabled
 
                 onClicked: MediaService.next()

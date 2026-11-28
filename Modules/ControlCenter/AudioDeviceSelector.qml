@@ -118,7 +118,7 @@ ControlCenterSurface {
                             color: deviceDelegate.modelData === root.selectedDevice
                                    ? Theme.primaryText : Theme.surfaceText
                             name: root.selectingInput ? "mic" : "speaker"
-                            size: Theme.iconSize - 4
+                            size: Theme.iconSize
                         }
                     }
 

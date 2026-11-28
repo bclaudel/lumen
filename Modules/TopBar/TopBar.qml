@@ -153,15 +153,26 @@ Variants {
                 }
 
                 TopBarButton {
-                    accessibleName: "Keep Awake active"
+                    accessibleName: "Stop screen recording"
                     active: true
-                    enabled: !SleepInhibitService.busy
-                    iconColor: Theme.primary
-                    iconName: "coffee"
-                    tooltipText: "Sleep blocked · click to turn off"
-                    visible: SleepInhibitService.active
+                    enabled: ScreenRecordingService.recording && !ScreenRecordingService.stopping
+                    iconColor: Theme.error
+                    iconName: "stop_circle"
+                    visible: ScreenRecordingService.active
 
-                    onClicked: SleepInhibitService.setEnabled(false)
+                    onClicked: ScreenRecordingService.stop()
+                }
+
+                TopBarButton {
+                    Accessible.role: Accessible.CheckBox
+                    Accessible.checked: SleepInhibitService.active
+                    accessibleName: "Stay Awake"
+                    active: SleepInhibitService.active
+                    enabled: SleepInhibitService.available && !SleepInhibitService.busy
+                    iconColor: active ? Theme.primary : Theme.surfaceText
+                    iconName: "coffee"
+
+                    onClicked: SleepInhibitService.toggle()
                 }
 
                 TopBarButton {

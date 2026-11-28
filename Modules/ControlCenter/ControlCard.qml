@@ -8,7 +8,6 @@ ControlCenterSurface {
     id: root
 
     property string actionAccessibleName: iconName
-    property int actionButtonSize: 46
     property bool active: false
     property bool available: true
     property bool expanded: false
@@ -34,7 +33,7 @@ ControlCenterSurface {
             Layout.alignment: Qt.AlignVCenter
             accessibleName: root.actionAccessibleName
             backgroundColor: root.active ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
-            buttonSize: root.actionButtonSize
+            buttonSize: Theme.controlCenterButtonSize
             enabled: root.available
             iconColor: root.active ? Theme.primaryText : Theme.surfaceText
             iconName: root.iconName
