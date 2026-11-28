@@ -5,10 +5,12 @@ import QtQuick.Layouts
 
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Wayland
 
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 PanelWindow {
     id: root
@@ -109,6 +111,45 @@ PanelWindow {
 
         onCleared: () => {
             root.closeControlCenter();
+        }
+    }
+
+    Timer {
+        id: screenshotDelay
+
+        interval: root.transitionDuration
+        onTriggered: screenshotCapture.running = true
+    }
+
+    Process {
+        id: screenshotCapture
+
+        // Slurp reads predefined regions from stdin before opening the selector.
+        command: ["sh", "-c", `
+            region=$(slurp -d </dev/null) || exit 0
+            [ -n "$region" ] || exit 0
+
+            pictures=$(xdg-user-dir PICTURES 2>/dev/null)
+            [ -n "$pictures" ] || pictures="$HOME/Pictures"
+            directory="$pictures/Screenshots"
+            file="$directory/Screenshot-$(date +%Y-%m-%d_%H-%M-%S-%N).png"
+            if ! mkdir -p "$directory" || ! grim -g "$region" "$file"; then
+                notify-send -a Lumen "Screenshot failed" "Could not save the selected area."
+                exit 1
+            fi
+
+            if wl-copy --type image/png < "$file"; then
+                notify-send -a Lumen "Screenshot saved and copied" "$file"
+            else
+                notify-send -a Lumen "Screenshot saved" "$file"
+            fi
+        `]
+
+        stderr: StdioCollector {
+            onStreamFinished: {
+                if (text.trim())
+                    console.warn("Screenshot capture:", text.trim());
+            }
         }
     }
 
@@ -228,8 +269,73 @@ PanelWindow {
                         }
                     }
 
-                    SleepInhibitCard {
+                    RowLayout {
                         Layout.fillWidth: true
+                        spacing: Theme.spacingM
+
+                        SleepInhibitCard {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                        }
+
+                        IconButton {
+                            id: screenshotButton
+
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: 1
+                            accessibleName: "Take Screenshot"
+                            backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.38)
+                            circular: false
+                            enabled: !screenshotDelay.running && !screenshotCapture.running
+                            iconName: "photo_camera"
+                            stateColor: Theme.surfaceText
+
+                            contentItem: RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: Theme.spacingM
+                                spacing: Theme.spacingM
+
+                                Rectangle {
+                                    Layout.preferredHeight: 42
+                                    Layout.preferredWidth: 42
+                                    color: Theme.withAlpha(Theme.surfaceText, 0.12)
+                                    radius: height / 2
+
+                                    MaterialIcon {
+                                        anchors.centerIn: parent
+                                        name: screenshotButton.iconName
+                                        size: Theme.iconSize
+                                    }
+                                }
+
+                                ColumnLayout {
+                                    Layout.fillWidth: true
+                                    spacing: 2
+
+                                    StyledText {
+                                        Layout.fillWidth: true
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.weight: Font.DemiBold
+                                        text: "Screenshot"
+                                        wrapMode: Text.NoWrap
+                                    }
+
+                                    StyledText {
+                                        Layout.fillWidth: true
+                                        color: Theme.surfaceTextMedium
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        text: "Select an area"
+                                        wrapMode: Text.NoWrap
+                                    }
+                                }
+                            }
+
+                            onClicked: {
+                                root.closeControlCenter();
+                                screenshotDelay.restart();
+                            }
+                        }
                     }
 
                     ControlSlider {
