@@ -179,8 +179,9 @@ Scope {
 
                         buttonText: "Sleep"
                         buttonIcon: "dark_mode"
+                        enabled: !SleepInhibitService.busy
                         onClicked: {
-                            Quickshell.execDetached(["systemctl", "suspend"]);
+                            SleepInhibitService.requestSleep("suspend");
                             root.closeSessionScreen();
                         }
                         onFocusChanged: {
@@ -236,8 +237,9 @@ Scope {
 
                         buttonText: "Hibernate"
                         buttonIcon: "downloading"
+                        enabled: !SleepInhibitService.busy
                         onClicked: {
-                            Quickshell.execDetached(["systemctl", "hibernate"]);
+                            SleepInhibitService.requestSleep("hibernate");
                             root.closeSessionScreen();
                         }
                         onFocusChanged: {

@@ -153,6 +153,18 @@ Variants {
                 }
 
                 TopBarButton {
+                    accessibleName: "Keep Awake active"
+                    active: true
+                    enabled: !SleepInhibitService.busy
+                    iconColor: Theme.primary
+                    iconName: "coffee"
+                    tooltipText: "Sleep blocked · click to turn off"
+                    visible: SleepInhibitService.active
+
+                    onClicked: SleepInhibitService.setEnabled(false)
+                }
+
+                TopBarButton {
                     id: notificationButton
 
                     accessibleName: "Notifications"

@@ -16,7 +16,7 @@ PanelWindow {
     property int audioDeviceExpansionHeight: 0
     readonly property int audioDeviceSelectorMaximumHeight: 230
     property bool audioDeviceSelectorOpen: false
-    readonly property int baseControlCenterHeight: 578
+    readonly property int baseControlCenterHeight: 578 + 68 + Theme.spacingM
     readonly property int controlCenterHeight: baseControlCenterHeight + audioDeviceExpansionHeight
     property int controlCenterWidth: 420
     readonly property int maximumControlCenterHeight: baseControlCenterHeight + Theme.spacingM
@@ -45,6 +45,7 @@ PanelWindow {
         BrightnessService.setTargetScreen(resolvedScreen);
         NetworkService.refreshNetworkState();
         BluetoothService.refreshConnectionState();
+        SleepInhibitService.refresh();
 
         if (screenChanged) {
             Qt.callLater(() => {
@@ -225,6 +226,10 @@ PanelWindow {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
                         }
+                    }
+
+                    SleepInhibitCard {
+                        Layout.fillWidth: true
                     }
 
                     ControlSlider {
