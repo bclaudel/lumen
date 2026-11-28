@@ -7,8 +7,11 @@ import qs.Widgets
 ControlCenterSurface {
     id: root
 
+    property string actionAccessibleName: iconName
+    property int actionButtonSize: 46
     property bool active: false
     property bool available: true
+    property bool expanded: false
     property string iconName: ""
     property string subtitle: ""
     property string title: ""
@@ -29,8 +32,9 @@ ControlCenterSurface {
 
         IconButton {
             Layout.alignment: Qt.AlignVCenter
+            accessibleName: root.actionAccessibleName
             backgroundColor: root.active ? Theme.primary : Theme.withAlpha(Theme.surfaceText, 0.12)
-            buttonSize: 46
+            buttonSize: root.actionButtonSize
             enabled: root.available
             iconColor: root.active ? Theme.primaryText : Theme.surfaceText
             iconName: root.iconName
@@ -74,7 +78,7 @@ ControlCenterSurface {
                 anchors.rightMargin: Theme.spacingXS
                 anchors.verticalCenter: parent.verticalCenter
                 color: Theme.surfaceTextMedium
-                name: "chevron_right"
+                name: root.expanded ? "expand_more" : "chevron_right"
                 size: Theme.iconSizeSmall
             }
 

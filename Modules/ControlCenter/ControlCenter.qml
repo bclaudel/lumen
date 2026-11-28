@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls as Controls
 import QtQuick.Layouts
 
 import Quickshell
@@ -20,18 +21,53 @@ PanelWindow {
     property bool audioDeviceSelectorOpen: false
     readonly property int baseControlCenterHeight: 578 + 68 + Theme.spacingM
     readonly property int controlCenterHeight: baseControlCenterHeight + audioDeviceExpansionHeight
+                                               + (screenshotOptionsOpen ? screenshotOptionsHeight
+                                                                          + Theme.spacingM : 0)
     property int controlCenterWidth: 420
     readonly property int maximumControlCenterHeight: baseControlCenterHeight + Theme.spacingM
                                                       + audioDeviceSelectorMaximumHeight
     readonly property int transitionDuration: 160
     property bool isOpen: false
     property int openGeneration: 0
+    readonly property var screenshotModes: [
+        {
+            mode: "screen",
+            label: "Screen",
+            icon: "desktop_windows"
+        },
+        {
+            mode: "window",
+            label: "Window",
+            icon: "web_asset"
+        },
+        {
+            mode: "area",
+            label: "Area",
+            icon: "crop_free"
+        }
+    ]
+    readonly property int screenshotModeRowHeight: 36
+    readonly property int screenshotOptionsHeight: 2 * Theme.spacingS + screenshotModes.length
+                                                   * screenshotModeRowHeight + (
+                                                       screenshotModes.length - 1) * Theme.spacingXS
+    property bool screenshotOptionsOpen: false
+    property string selectedScreenshotMode: "area"
     property bool selectingInput: false
     property var targetScreen: null
 
     function closeControlCenter() {
         openGeneration++;
         isOpen = false;
+    }
+
+    function takeScreenshot() {
+        if (screenshotDelay.running || screenshotCapture.running)
+            return;
+
+        screenshotCapture.mode = selectedScreenshotMode;
+        screenshotCapture.outputName = targetScreen?.name ?? "";
+        closeControlCenter();
+        screenshotDelay.restart();
     }
 
     function openControlCenter(requestedScreen) {
@@ -81,6 +117,7 @@ PanelWindow {
             BrightnessService.refreshCurrentValue();
         } else {
             audioDeviceSelectorOpen = false;
+            screenshotOptionsOpen = false;
         }
     }
 
@@ -124,26 +161,10 @@ PanelWindow {
     Process {
         id: screenshotCapture
 
-        // Slurp reads predefined regions from stdin before opening the selector.
-        command: ["sh", "-c", `
-            region=$(slurp -d </dev/null) || exit 0
-            [ -n "$region" ] || exit 0
+        property string mode: ""
+        property string outputName: ""
 
-            pictures=$(xdg-user-dir PICTURES 2>/dev/null)
-            [ -n "$pictures" ] || pictures="$HOME/Pictures"
-            directory="$pictures/Screenshots"
-            file="$directory/Screenshot-$(date +%Y-%m-%d_%H-%M-%S-%N).png"
-            if ! mkdir -p "$directory" || ! grim -g "$region" "$file"; then
-                notify-send -a Lumen "Screenshot failed" "Could not save the selected area."
-                exit 1
-            fi
-
-            if wl-copy --type image/png < "$file"; then
-                notify-send -a Lumen "Screenshot saved and copied" "$file"
-            else
-                notify-send -a Lumen "Screenshot saved" "$file"
-            fi
-        `]
+        command: ["sh", Quickshell.shellPath("Scripts/screenshot.sh"), mode, outputName]
 
         stderr: StdioCollector {
             onStreamFinished: {
@@ -278,62 +299,97 @@ PanelWindow {
                             Layout.preferredWidth: 1
                         }
 
-                        IconButton {
-                            id: screenshotButton
-
+                        ControlCard {
                             Layout.fillHeight: true
                             Layout.fillWidth: true
                             Layout.preferredWidth: 1
-                            accessibleName: "Take Screenshot"
-                            backgroundColor: Theme.withAlpha(Theme.surfaceVariant, 0.38)
-                            circular: false
-                            enabled: !screenshotDelay.running && !screenshotCapture.running
+                            actionAccessibleName: "Take screenshot (" + subtitle + ")"
+                            actionButtonSize: 42
+                            active: root.screenshotOptionsOpen
+                            available: !screenshotDelay.running && !screenshotCapture.running
+                            expanded: root.screenshotOptionsOpen
                             iconName: "photo_camera"
-                            stateColor: Theme.surfaceText
+                            implicitHeight: 68
+                            subtitle: root.screenshotModes.find(entry => entry.mode
+                                                                         === root.selectedScreenshotMode).label
+                            title: "Screenshot"
 
-                            contentItem: RowLayout {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingM
-                                spacing: Theme.spacingM
-
-                                Rectangle {
-                                    Layout.preferredHeight: 42
-                                    Layout.preferredWidth: 42
-                                    color: Theme.withAlpha(Theme.surfaceText, 0.12)
-                                    radius: height / 2
-
-                                    MaterialIcon {
-                                        anchors.centerIn: parent
-                                        name: screenshotButton.iconName
-                                        size: Theme.iconSize
-                                    }
-                                }
-
-                                ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 2
-
-                                    StyledText {
-                                        Layout.fillWidth: true
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.DemiBold
-                                        text: "Screenshot"
-                                        wrapMode: Text.NoWrap
-                                    }
-
-                                    StyledText {
-                                        Layout.fillWidth: true
-                                        color: Theme.surfaceTextMedium
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        text: "Select an area"
-                                        wrapMode: Text.NoWrap
-                                    }
-                                }
+                            onOpenRequested: {
+                                root.audioDeviceSelectorOpen = false;
+                                root.screenshotOptionsOpen = !root.screenshotOptionsOpen;
                             }
+                            onToggleRequested: root.takeScreenshot()
+                        }
+                    }
 
-                            onClicked: {
-                                root.closeControlCenter();
-                                screenshotDelay.restart();
+                    ControlCenterSurface {
+                        Layout.fillWidth: true
+                        implicitHeight: root.screenshotOptionsHeight
+                        visible: root.screenshotOptionsOpen
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingS
+                            spacing: Theme.spacingXS
+
+                            Repeater {
+                                model: root.screenshotModes
+
+                                delegate: Controls.AbstractButton {
+                                    id: modeButton
+
+                                    required property var modelData
+                                    readonly property bool selected: modelData.mode
+                                                                     === root.selectedScreenshotMode
+
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: root.screenshotModeRowHeight
+                                    Accessible.name: modelData.label
+                                    Accessible.role: Accessible.RadioButton
+                                    Accessible.checked: selected
+                                    hoverEnabled: true
+                                    leftPadding: Theme.spacingM
+                                    rightPadding: Theme.spacingM
+
+                                    background: ControlCenterSurface {
+                                        border.color: modeButton.selected ? Theme.primary :
+                                                                            "transparent"
+                                        color: modeButton.selected ? Theme.primarySelected :
+                                                                     "transparent"
+
+                                        StateOverlay {
+                                            hovered: modeButton.hovered
+                                            pressed: modeButton.down
+                                            focused: modeButton.visualFocus
+                                        }
+                                    }
+
+                                    contentItem: RowLayout {
+                                        spacing: Theme.spacingM
+
+                                        MaterialIcon {
+                                            name: modeButton.modelData.icon
+                                            size: Theme.iconSizeSmall
+                                        }
+
+                                        StyledText {
+                                            Layout.fillWidth: true
+                                            text: modeButton.modelData.label
+                                        }
+
+                                        MaterialIcon {
+                                            color: Theme.primary
+                                            name: "check"
+                                            size: Theme.iconSizeSmall
+                                            visible: modeButton.selected
+                                        }
+                                    }
+
+                                    onClicked: {
+                                        root.selectedScreenshotMode = modelData.mode;
+                                        root.screenshotOptionsOpen = false;
+                                    }
+                                }
                             }
                         }
                     }
@@ -381,6 +437,7 @@ PanelWindow {
                         selectingInput: root.selectingInput
 
                         onSelectionRequested: input => {
+                            root.screenshotOptionsOpen = false;
                             if (root.audioDeviceSelectorOpen && root.selectingInput === input) {
                                 root.audioDeviceSelectorOpen = false;
                             } else {
@@ -404,6 +461,8 @@ PanelWindow {
             onActivated: {
                 if (root.audioDeviceSelectorOpen)
                     root.audioDeviceSelectorOpen = false;
+                else if (root.screenshotOptionsOpen)
+                    root.screenshotOptionsOpen = false;
                 else
                     root.closeControlCenter();
             }
